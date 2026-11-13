@@ -221,6 +221,9 @@ button{cursor:pointer}
 .bhw-demographic-panel .section-head{margin:0 0 8px}
 @media(max-width:680px){.bhw-demographic-tables{grid-template-columns:1fr}.bhw-summary-table{font-size:11px}.bhw-summary-table th,.bhw-summary-table td{padding:9px 8px}}
 
+
+.bhw-summary-table tfoot th{padding:10px 12px;border-top:2px solid var(--line,#e6edf5);background:var(--surface-soft,#f6f9fc);font-weight:900}
+
 </style>
 
 
@@ -2896,7 +2899,7 @@ function renderLeaderUnit(){
   const types=(REPORT_TYPE_OPTIONS||[]).filter(Boolean);
   const names=(currentUnitData.bhwMembers||[]).filter(x=>String(x.fullName||'').trim());
   if(!currentUnitData.bhwMembersLoaded) loadMyBarangayBhwCount().catch(err=>console.warn("Unable to load barangay BHW members",err));
-  const summaryTypes=renderReportTypeMiniCards(t);
+  const summaryTypes=renderReportTypeTable(t);
   $("unitPage").innerHTML=`
     <div class="section-head"><div><h2>${esc(u.name)}</h2><p>Barangay HeatWatch overview — assigned barangay only.</p></div></div>
     <div class="kpis" style="margin-top:14px">
@@ -2909,7 +2912,7 @@ function renderLeaderUnit(){
     </div>
     <div class="card" style="margin-top:14px">
       <div class="section-head"><div><h2>🌡️ Total Report Types</h2><p>Active illness categories available for reporting.</p></div><strong class="status ok">${types.length} Active</strong></div>
-      <div class="mini-cards">${summaryTypes||'<div class="notice">No active report types configured.</div>'}</div>
+      ${summaryTypes||'<div class="notice">No active report types configured.</div>'}
     </div>`;
 }
 
@@ -3008,6 +3011,19 @@ async function deleteAssignment(row,slot){
   try{beginRoleDataMutation();await apiPost("adminDeleteAssignment",{row,slot});await loadRoleData(true);renderDutyPage();}catch(e){alert(e.message)}
 }
 async function apiSync(){try{beginRoleDataMutation();await apiPost("syncDuty");await loadRoleData(true);renderDutyPage();alert("Duty schedule synchronized and refreshed.")}catch(e){alert(e.message)}}
+
+function renderReportTypeTable(t){
+  const totals=t||{};
+  const fixedKeys=new Set(["totalReports","totalPersons","Other"]);
+  const historicalTypes=Object.keys(totals).filter(key=>!fixedKeys.has(key)&&!REPORT_TYPE_OPTIONS.includes(key));
+  const types=[...new Set([...REPORT_TYPE_OPTIONS,...historicalTypes])];
+  if(Number(totals.Other||0)>0) types.push("Other (legacy records)");
+  const rows=types.map(type=>{
+    const key=type==="Other (legacy records)"?"Other":type;
+    return `<tr><td>${esc(type)}</td><td class="bhw-table-number">${analyticsCount(totals[key]||0)}</td></tr>`;
+  }).join("");
+  return `<div class="table-wrap"><table class="bhw-summary-table"><thead><tr><th>Report Type</th><th class="bhw-table-number">Persons Reported</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th>Total Persons Reported</th><th class="bhw-table-number">${analyticsCount(totals.totalPersons||0)}</th></tr></tfoot></table></div>`;
+}
 
 function renderReportTypeMiniCards(t){
   const totals=t||{};
@@ -4073,10 +4089,10 @@ function renderAdminReportAnalytics(contextRows){
     if(["female","f","woman","girl"].includes(g))genderBuckets[0].value++;
     else if(["male","m","man","boy"].includes(g))genderBuckets[1].value++;
   });
-  const ageGroups=HEAT_AGE_GROUP_LABELS.map(label=>({label:heatAgeGroupDisplay(label),value:0}));
+  const ageGroups=HEAT_AGE_GROUP_LABELS.map(key=>({key,label:heatAgeGroupDisplay(key),value:0}));
   patients.forEach(p=>{
-    const label=classifyHeatAge(p.age);
-    const bucket=ageGroups.find(group=>group.label===label);
+    const key=classifyHeatAge(p.age);
+    const bucket=ageGroups.find(group=>group.key===key);
     if(bucket) bucket.value++;
   });
   const statusCounts=[...new Set(rows.map(r=>String(r.status||"Unspecified").trim()||"Unspecified"))].map(label=>({label,value:rows.filter(r=>(String(r.status||"Unspecified").trim()||"Unspecified")===label).length})).sort((a,b)=>b.value-a.value);
