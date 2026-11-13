@@ -836,7 +836,7 @@ button{cursor:pointer}
       <div class="ios-tip" style="margin:0 0 14px">
         <b>Android App</b>
         <p style="margin:6px 0 10px">I-download ang i-KONEK application para sa Android device.</p>
-        <a class="btn primary" href="https://raw.githubusercontent.com/nmax07152020-sudo/i-konek/main/ikonek.apk" download="ikonek.apk" target="_blank" rel="noopener" style="display:inline-flex;text-decoration:none">⬇ Download i-KONEK APK</a>
+        <button class="btn primary" id="downloadIkonekApkBtn" type="button" style="display:inline-flex;text-decoration:none">⬇ Download i-KONEK APK</button>
       </div>
       <p style="margin:0 0 12px;color:var(--muted);font-size:10px;line-height:1.5">Walang kailangang i-install na Android APK sa iPhone/iPad. Para madaling balikan ang i-KONEK dashboard, gamitin ang Safari at idagdag ito sa Home Screen o Bookmark.</p>
       <div class="ios-guide-grid">
@@ -5029,6 +5029,42 @@ body.ikonek-privacy-open{overflow:hidden}
  closeBtns.forEach(btn=>{if(btn)btn.addEventListener('click',close)});
  modal.querySelectorAll('[data-close-privacy]').forEach(el=>el.addEventListener('click',close));
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&modal.classList.contains('is-open'))close()});
+})();
+</script>
+
+
+<script id="ikonek-apk-download-filename-fix">
+(function(){
+  const button=document.getElementById("downloadIkonekApkBtn");
+  if(!button) return;
+  const APK_URL="https://raw.githubusercontent.com/nmax07152020-sudo/e-konek/main/e-konek.apk";
+  button.addEventListener("click",async function(){
+    const original=button.textContent;
+    button.disabled=true;
+    button.textContent="Preparing ikonek.apk…";
+    try{
+      const response=await fetch(APK_URL,{mode:"cors",cache:"no-store"});
+      if(!response.ok) throw new Error("GitHub returned HTTP "+response.status);
+      const blob=await response.blob();
+      if(!blob.size) throw new Error("The APK file is empty.");
+      const objectUrl=URL.createObjectURL(blob);
+      const link=document.createElement("a");
+      link.href=objectUrl;
+      link.download="ikonek.apk";
+      link.style.display="none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectUrl),60000);
+      button.textContent="✓ Download Started";
+      setTimeout(()=>{button.textContent=original;button.disabled=false;},2500);
+    }catch(error){
+      console.error("i-KONEK APK download failed:",error);
+      button.disabled=false;
+      button.textContent=original;
+      alert("Hindi ma-download ang APK. Pakisubukan ulit o buksan ang download link sa Chrome. Details: "+error.message);
+    }
+  });
 })();
 </script>
 
