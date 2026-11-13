@@ -200,6 +200,15 @@ button{cursor:pointer}
  .ikonek-acronym{font-size:7.5px;line-height:1.2}
 }
 
+
+.bhw-analytics-age-list{display:grid;gap:8px}
+.bhw-analytics-row{display:grid;grid-template-columns:minmax(105px,1.1fr) minmax(70px,2fr) 34px;align-items:center;gap:10px;font-size:12px}
+.bhw-analytics-row>span{font-weight:700;color:var(--text)}
+.bhw-analytics-row>b{text-align:right;font-variant-numeric:tabular-nums}
+.bhw-analytics-track{height:9px;background:var(--line,#e8eef5);border-radius:99px;overflow:hidden}
+.bhw-analytics-track i{display:block;height:100%;background:linear-gradient(90deg,#0b68b7,#18a6a0);border-radius:99px}
+@media(max-width:520px){.bhw-analytics-row{grid-template-columns:minmax(88px,1fr) minmax(55px,1.2fr) 28px;gap:7px;font-size:10px}}
+
 </style>
 
 
@@ -724,7 +733,7 @@ button{cursor:pointer}
     </div>
 
     <div class="section-head">
-      <div><h2>Public Unit Overview</h2><p>No staff names or patient information are exposed on this public page.</p></div>
+      <div><h2>Barangay Reporting Unit</h2><p>No staff names or patient information are exposed on this public page.</p></div>
     </div>
     <div id="publicUnitGrid" class="public-units"></div>
   </main>
@@ -827,7 +836,7 @@ button{cursor:pointer}
       <div class="ios-tip" style="margin:0 0 14px">
         <b>Android App</b>
         <p style="margin:6px 0 10px">I-download ang i-KONEK application para sa Android device.</p>
-        <a class="btn primary" href="./ikonek.apk" download style="display:inline-flex;text-decoration:none">⬇ Download i-KONEK APK</a>
+        <a class="btn primary" href="https://raw.githubusercontent.com/nmax07152020-sudo/e-konek/main/e-konek.apk" download="ikonek.apk" target="_blank" rel="noopener" style="display:inline-flex;text-decoration:none">⬇ Download i-KONEK APK</a>
       </div>
       <p style="margin:0 0 12px;color:var(--muted);font-size:10px;line-height:1.5">Walang kailangang i-install na Android APK sa iPhone/iPad. Para madaling balikan ang i-KONEK dashboard, gamitin ang Safari at idagdag ito sa Home Screen o Bookmark.</p>
       <div class="ios-guide-grid">
@@ -2782,10 +2791,33 @@ function renderAllUnits(){
 }
 
 
+
+function renderBhwDashboardAnalytics(data){
+  const source=data||{};
+  const patients=Array.isArray(source.patients)?source.patients:[];
+  const reports=Array.isArray(source.reports)?source.reports:[];
+  const totals=source.reportTotals||{};
+  const ageCounts=HEAT_AGE_GROUP_LABELS.slice(0,8).map(label=>({label,value:patients.filter(patient=>classifyHeatAge(patient.age)===label).length}));
+  const statusLabels=["Manageable","Consultation / Medical Evaluation","Immediate Transfer / Referral"];
+  const statusCounts=statusLabels.map(label=>({label,value:reports.filter(report=>String(report.status||"").trim()===label).length}));
+  const maxAge=Math.max(1,...ageCounts.map(item=>item.value));
+  const ageRows=ageCounts.map(item=>`<div class="bhw-analytics-row"><span>${esc(heatAgeGroupDisplay(item.label))}</span><div class="bhw-analytics-track"><i style="width:${Math.round(item.value/maxAge*100)}%"></i></div><b>${item.value}</b></div>`).join("");
+  const statusRows=statusCounts.map(item=>`<div class="mini"><span>${esc(item.label)}</span><b>${item.value}</b></div>`).join("");
+  return `<div class="card bhw-dashboard-analytics" style="margin-top:14px">
+    <div class="section-head"><div><h2>📊 Barangay Report Analytics Summary</h2><p>Analytics are limited to ${esc(source.unit?.name||currentUser?.unit||"your assigned barangay")} only.</p></div><span class="status ok">🔒 Barangay only</span></div>
+    <div class="mini-cards"><div class="mini"><span>Total Reports</span><b>${Number(totals.totalReports||0)}</b></div><div class="mini"><span>Patients Recorded</span><b>${Number(totals.totalPersons||patients.length||0)}</b></div><div class="mini"><span>Patient Records with Age</span><b>${patients.filter(p=>String(p.age??"").trim()!=="").length}</b></div></div>
+    <div class="section-head" style="margin-top:14px"><div><h3>Age Group Distribution</h3><p>Based on patient records in your barangay.</p></div></div>
+    ${patients.length?`<div class="bhw-analytics-age-list">${ageRows}</div>`:`<div class="notice">No patient age records are available for this barangay yet.</div>`}
+    <div class="section-head" style="margin-top:14px"><div><h3>Report Status Breakdown</h3><p>Counts only reports returned for your assigned barangay.</p></div></div>
+    ${reports.length?`<div class="mini-cards">${statusRows}</div>`:`<div class="notice">Detailed report status records are not included in this dashboard response. Total report count above is from the barangay summary.</div>`}
+  </div>`;
+}
+
 function renderLeaderDashboard(){
   const u=currentUnitData.unit,t=currentUnitData.reportTotals||{};
   $("privateDashboard").innerHTML=`${offlineModeBanner()}<div class="private-banner"><div class="small">BARANGAY BHW PORTAL</div><h2>${esc(u.name)}</h2><p>Heat-related illness reporting for your assigned barangay only.</p><div class="locked">🔒 BARANGAY ACCESS RESTRICTED</div></div>
   <div class="kpis"><div class="kpi"><div class="kpi-icon">🏘️</div><div><label>Assigned Barangay</label><strong style="font-size:16px">${esc(u.name)}</strong><small>Locked account</small></div></div><div class="kpi"><div class="kpi-icon">🌡️</div><div><label>Total Heat Reports</label><strong>${t.totalReports||0}</strong><small>Your barangay</small></div></div><div class="kpi"><div class="kpi-icon">🩺</div><div><label>Patients Recorded</label><strong>${t.totalPersons||0}</strong><small>Your barangay</small></div></div><div class="kpi"><div class="kpi-icon">👥</div><div><label>BHWs in Your Barangay</label><strong id="myBarangayBhwCount">—</strong><small>Registered BHW accounts</small></div></div></div>
+  ${renderBhwDashboardAnalytics(currentUnitData)}
   `;
   loadMyBarangayBhwCount().catch(err=>{const el=$("myBarangayBhwCount");if(el)el.textContent="—";console.warn("Unable to load own barangay BHW count",err);});
 }
@@ -2996,7 +3028,7 @@ function renderReportPage(){
           <div class="form-title">2. PATIENT INFORMATION</div>
           <div class="notice">Search an existing patient first. Selecting a patient reuses the existing Patient ID and prevents duplicate patient records.</div>
           <div class="field"><label>Search Existing Patient</label><input id="existingPatientSearch" autocomplete="off" placeholder="Type patient name or Patient ID"><div id="existingPatientResults" class="patient-search-results" style="display:none"></div><input type="hidden" id="selectedPatientId"></div>
-          <div class="form-grid three"><div class="field"><label>Patient Name</label><input id="patientName" placeholder="Full name"></div><div class="field"><label>Age</label><input id="patientAge" type="number" min="0" max="120"></div><div class="field"><label>Gender</label><select id="patientGender"><option value="">Select</option><option>Male</option><option>Female</option></select></div></div>
+          <div class="form-grid three"><div class="field"><label>Patient Name</label><input id="patientName" placeholder="Full name"></div><div class="field"><label>Age</label><input id="patientAge" type="number" min="0" max="120" step="0.01" placeholder="Age in years (e.g. 0.05 for under 1 month)"></div><div class="field"><label>Gender</label><select id="patientGender"><option value="">Select</option><option>Male</option><option>Female</option></select></div></div>
           <div class="form-grid two"><div class="field"><label>Address</label><input id="patientAddress" placeholder="Address"></div><div class="field"><label>Contact Number</label><input id="patientContact" type="tel" inputmode="tel" placeholder="09XXXXXXXXX"></div></div>
           <div class="form-title">3. SYMPTOMS / SINTOMAS</div>
           <div class="field"><label>Symptoms / Sintomas <span>*</span></label><textarea id="reportDetails" required placeholder="Describe the patient’s symptoms, signs, and complaints. / Ilarawan ang mga sintomas at nararamdaman ng pasyente."></textarea></div>
@@ -3074,8 +3106,8 @@ function bindReportForm(){
     const btn=$("submitReportBtn");btn.disabled=true;btn.textContent="Saving…";
     try{
       const patientName=$("patientName").value.trim(), patientAge=$("patientAge").value;
-      if(patientAge && (!/^\d{1,3}$/.test(patientAge) || Number(patientAge)>120)){alert("Please enter a valid patient age from 0 to 120.");return}
-      const site=$("reportSite").value;
+      if(patientAge && (!/^(?:\d{1,3})(?:\.\d{1,2})?$/.test(patientAge) || Number(patientAge)>120)){alert("Please enter a valid patient age from 0 to 120. Decimals may be used for age in months.");return}
+      const site=currentUser?.role==="TEAM_LEADER"?String(currentUser.unit||""):$("reportSite").value;
       const leader=currentUser.fullName||currentUser.username||"Admin";
       const payload={
         cemetery:site,teamLeader:leader,reporter:leader,
@@ -3963,6 +3995,36 @@ function analyticsBars(title,subtitle,items,options={}){
   }).join(""):`<div class="analytics-empty">No records to chart for this selection.</div>`;
   return `<section class="report-chart-card"><div class="report-chart-heading"><div><h3>${esc(title)}</h3><p>${esc(subtitle||"")}</p></div></div><div class="report-bar-list">${content}</div></section>`;
 }
+
+function classifyHeatAge(ageValue){
+  const raw=String(ageValue==null?"":ageValue).trim();
+  const age=raw===""?NaN:Number(raw);
+  if(!Number.isFinite(age)||age<0||age>125) return "Age not recorded";
+  if(age<1/12) return "Newborn";
+  if(age<2) return "Infant";
+  if(age<3) return "Toddler";
+  if(age<5) return "Pre-Schooler";
+  if(age<13) return "Child";
+  if(age<19) return "Teenager";
+  if(age<60) return "Adult";
+  return "Senior Citizens";
+}
+const HEAT_AGE_GROUP_LABELS=["Newborn","Infant","Toddler","Pre-Schooler","Child","Teenager","Adult","Senior Citizens","Age not recorded"];
+function heatAgeGroupDisplay(label){
+  const brackets={
+    "Newborn":"0–less than 1 month",
+    "Infant":"1 month–less than 2 years",
+    "Toddler":"2–less than 3 years",
+    "Pre-Schooler":"3–less than 5 years",
+    "Child":"5–less than 13 years",
+    "Teenager":"13–less than 19 years",
+    "Adult":"19–less than 60 years",
+    "Senior Citizens":"60 years and above",
+    "Age not recorded":"Age not recorded"
+  };
+  return brackets[label] ? `${label} (${brackets[label]})` : label;
+}
+
 function renderAdminReportAnalytics(contextRows){
   const rows=Array.isArray(contextRows)?contextRows:[];
   const patients=getAdminPatientsByContext(rows);
@@ -3978,16 +4040,11 @@ function renderAdminReportAnalytics(contextRows){
     if(["female","f","woman","girl"].includes(g))genderBuckets[0].value++;
     else if(["male","m","man","boy"].includes(g))genderBuckets[1].value++;
   });
-  const ageGroups=[{label:"0–17 years",value:0},{label:"18–29 years",value:0},{label:"30–44 years",value:0},{label:"45–59 years",value:0},{label:"60+ years",value:0},{label:"Age not recorded",value:0}];
+  const ageGroups=HEAT_AGE_GROUP_LABELS.map(label=>({label:heatAgeGroupDisplay(label),value:0}));
   patients.forEach(p=>{
-    const age=String(p.age==null?"":p.age).trim();
-    const n=age===""?NaN:Number(age);
-    if(!Number.isFinite(n)||n<0||n>125)ageGroups[5].value++;
-    else if(n<18)ageGroups[0].value++;
-    else if(n<30)ageGroups[1].value++;
-    else if(n<45)ageGroups[2].value++;
-    else if(n<60)ageGroups[3].value++;
-    else ageGroups[4].value++;
+    const label=classifyHeatAge(p.age);
+    const bucket=ageGroups.find(group=>group.label===label);
+    if(bucket) bucket.value++;
   });
   const statusCounts=[...new Set(rows.map(r=>String(r.status||"Unspecified").trim()||"Unspecified"))].map(label=>({label,value:rows.filter(r=>(String(r.status||"Unspecified").trim()||"Unspecified")===label).length})).sort((a,b)=>b.value-a.value);
   return `<div class="report-analytics-kpis">
