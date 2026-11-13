@@ -209,6 +209,18 @@ button{cursor:pointer}
 .bhw-analytics-track i{display:block;height:100%;background:linear-gradient(90deg,#0b68b7,#18a6a0);border-radius:99px}
 @media(max-width:520px){.bhw-analytics-row{grid-template-columns:minmax(88px,1fr) minmax(55px,1.2fr) 28px;gap:7px;font-size:10px}}
 
+
+.bhw-summary-table-wrap{width:100%;overflow-x:auto}
+.bhw-summary-table{width:100%;border-collapse:collapse;font-size:12px;min-width:260px}
+.bhw-summary-table th,.bhw-summary-table td{padding:10px 12px;border-bottom:1px solid var(--line,#e6edf5);text-align:left}
+.bhw-summary-table th{font-weight:800;color:var(--muted);background:var(--surface-soft,#f6f9fc)}
+.bhw-summary-table tbody tr:last-child td{border-bottom:0}
+.bhw-table-number{text-align:right!important;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bhw-demographic-tables{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:16px;align-items:start}
+.bhw-demographic-panel{min-width:0;border:1px solid var(--line,#e6edf5);border-radius:13px;padding:12px;background:var(--card,#fff)}
+.bhw-demographic-panel .section-head{margin:0 0 8px}
+@media(max-width:680px){.bhw-demographic-tables{grid-template-columns:1fr}.bhw-summary-table{font-size:11px}.bhw-summary-table th,.bhw-summary-table td{padding:9px 8px}}
+
 </style>
 
 
@@ -2792,24 +2804,41 @@ function renderAllUnits(){
 
 
 
+
 function renderBhwDashboardAnalytics(data){
   const source=data||{};
   const patients=Array.isArray(source.patients)?source.patients:[];
   const reports=Array.isArray(source.reports)?source.reports:[];
   const totals=source.reportTotals||{};
-  const ageCounts=HEAT_AGE_GROUP_LABELS.slice(0,8).map(label=>({label,value:patients.filter(patient=>classifyHeatAge(patient.age)===label).length}));
+  const ageCounts=HEAT_AGE_GROUP_LABELS.slice(0,8).map(label=>({
+    label:heatAgeGroupDisplay(label),
+    value:patients.filter(patient=>classifyHeatAge(patient.age)===label).length
+  }));
+  const genderCounts=[
+    {label:"Female",value:patients.filter(p=>["female","f","woman","girl"].includes(String(p.gender||"").trim().toLowerCase())).length},
+    {label:"Male",value:patients.filter(p=>["male","m","man","boy"].includes(String(p.gender||"").trim().toLowerCase())).length},
+    {label:"Not recorded",value:patients.filter(p=>!["female","f","woman","girl","male","m","man","boy"].includes(String(p.gender||"").trim().toLowerCase())).length}
+  ];
   const statusLabels=["Manageable","Consultation / Medical Evaluation","Immediate Transfer / Referral"];
   const statusCounts=statusLabels.map(label=>({label,value:reports.filter(report=>String(report.status||"").trim()===label).length}));
-  const maxAge=Math.max(1,...ageCounts.map(item=>item.value));
-  const ageRows=ageCounts.map(item=>`<div class="bhw-analytics-row"><span>${esc(heatAgeGroupDisplay(item.label))}</span><div class="bhw-analytics-track"><i style="width:${Math.round(item.value/maxAge*100)}%"></i></div><b>${item.value}</b></div>`).join("");
-  const statusRows=statusCounts.map(item=>`<div class="mini"><span>${esc(item.label)}</span><b>${item.value}</b></div>`).join("");
+  const tableRows=(items)=>items.map(item=>`<tr><td>${esc(item.label)}</td><td class="bhw-table-number">${analyticsCount(item.value)}</td></tr>`).join("");
   return `<div class="card bhw-dashboard-analytics" style="margin-top:14px">
     <div class="section-head"><div><h2>📊 Barangay Report Analytics Summary</h2><p>Analytics are limited to ${esc(source.unit?.name||currentUser?.unit||"your assigned barangay")} only.</p></div><span class="status ok">🔒 Barangay only</span></div>
-    <div class="mini-cards"><div class="mini"><span>Total Reports</span><b>${Number(totals.totalReports||0)}</b></div><div class="mini"><span>Patients Recorded</span><b>${Number(totals.totalPersons||patients.length||0)}</b></div><div class="mini"><span>Patient Records with Age</span><b>${patients.filter(p=>String(p.age??"").trim()!=="").length}</b></div></div>
-    <div class="section-head" style="margin-top:14px"><div><h3>Age Group Distribution</h3><p>Based on patient records in your barangay.</p></div></div>
-    ${patients.length?`<div class="bhw-analytics-age-list">${ageRows}</div>`:`<div class="notice">No patient age records are available for this barangay yet.</div>`}
-    <div class="section-head" style="margin-top:14px"><div><h3>Report Status Breakdown</h3><p>Counts only reports returned for your assigned barangay.</p></div></div>
-    ${reports.length?`<div class="mini-cards">${statusRows}</div>`:`<div class="notice">Detailed report status records are not included in this dashboard response. Total report count above is from the barangay summary.</div>`}
+    <div class="bhw-summary-table-wrap"><table class="bhw-summary-table"><thead><tr><th>Report Summary</th><th class="bhw-table-number">Total</th></tr></thead><tbody>
+      <tr><td>Total Reports</td><td class="bhw-table-number">${analyticsCount(totals.totalReports||0)}</td></tr>
+      <tr><td>Patients Recorded</td><td class="bhw-table-number">${analyticsCount(totals.totalPersons||patients.length||0)}</td></tr>
+      <tr><td>Patient Records with Age</td><td class="bhw-table-number">${analyticsCount(patients.filter(p=>String(p.age??"").trim()!=="").length)}</td></tr>
+    </tbody></table></div>
+    <div class="bhw-demographic-tables">
+      <section class="bhw-demographic-panel"><div class="section-head"><div><h3>Age Group Distribution</h3><p>Patient records by age group</p></div></div>
+        <div class="table-wrap"><table class="bhw-summary-table"><thead><tr><th>Age Group / Bracket</th><th class="bhw-table-number">Patients</th></tr></thead><tbody>${tableRows(ageCounts)}</tbody></table></div>
+      </section>
+      <section class="bhw-demographic-panel"><div class="section-head"><div><h3>Gender Distribution</h3><p>Patient records by gender</p></div></div>
+        <div class="table-wrap"><table class="bhw-summary-table"><thead><tr><th>Gender</th><th class="bhw-table-number">Patients</th></tr></thead><tbody>${tableRows(genderCounts)}</tbody></table></div>
+      </section>
+    </div>
+    <div class="section-head" style="margin-top:16px"><div><h3>Report Status Breakdown</h3><p>Reports from your assigned barangay only.</p></div></div>
+    <div class="table-wrap"><table class="bhw-summary-table"><thead><tr><th>Status</th><th class="bhw-table-number">Reports</th></tr></thead><tbody>${tableRows(statusCounts)}</tbody></table></div>
   </div>`;
 }
 
@@ -3949,6 +3978,7 @@ function getFilteredAdminReportRows(){
   if(type)rows=rows.filter(r=>String(r.type||"")===type);
   return rows;
 }
+
 function getAdminPatientsByContext(reportRows){
   const patients=Array.isArray(adminData.patients)?adminData.patients:[];
   const unit=$("reportUnitFilter")?.value||"";
@@ -3956,19 +3986,22 @@ function getAdminPatientsByContext(reportRows){
   const to=$("reportDateTo")?.value||"";
   const reports=Array.isArray(adminData.reports)?adminData.reports:[];
   const reportById=new Map(reports.map(r=>[String(r.reportId||""),r]));
-  const contextReportIds=new Set(reportRows.map(r=>String(r.reportId||"")));
+  const contextReportIds=new Set((Array.isArray(reportRows)?reportRows:[]).map(r=>String(r.reportId||"")));
   return patients.filter(p=>{
     const linked=reportById.get(String(p.linkedReportId||""));
-    const patientUnit=String(p.cemetery||linked?.cemetery||"");
-    if(unit&&patientUnit!==unit)return false;
-    const d=reportAnalyticsDateKey(linked?.reportDate||linked?.timestamp||p.createdAt);
-    if(from&&(!d||d<from))return false;
-    if(to&&(!d||d>to))return false;
-    // If a linked report is available, respect any report-level exclusions already applied above.
-    if(p.linkedReportId && linked && !contextReportIds.has(String(linked.reportId||"")))return false;
+    const patientUnit=String(p.cemetery||p.barangay||linked?.cemetery||"").trim();
+    if(unit && patientUnit && patientUnit!==unit)return false;
+    if(unit && !patientUnit)return false;
+    const dateValue=linked?.reportDate||linked?.timestamp||p.createdAt||p.timestamp||p.dateRecorded||"";
+    const d=reportAnalyticsDateKey(dateValue);
+    if(from && d && d<from)return false;
+    if(to && d && d>to)return false;
+    if((from||to) && !d)return false;
+    if(p.linkedReportId && linked && contextReportIds.size && !contextReportIds.has(String(linked.reportId||"")))return false;
     return true;
   });
 }
+
 function analyticsCount(value){return Number(value||0).toLocaleString("en-PH");}
 function analyticsDonut(title,items,centerLabel){
   const palette=["#0b76df","#14a875","#f0a120","#8b5cf6","#e45b77","#20a5b6","#7890aa"];
