@@ -3887,6 +3887,39 @@ async function removeReportType(name){
   }
 }
 
+function switchAdminAnalyticsTab(tab){
+  const daily=tab==="daily";
+  const summaryTab=$("adminAnalyticsTabSummary"),dailyTab=$("adminAnalyticsTabDaily");
+  const summaryPanel=$("adminAnalyticsSummaryPanel"),dailyPanel=$("adminAnalyticsDailyPanel");
+  if(!summaryTab||!dailyTab||!summaryPanel||!dailyPanel)return;
+  summaryTab.classList.toggle("active",!daily);dailyTab.classList.toggle("active",daily);
+  summaryTab.setAttribute("aria-selected",String(!daily));dailyTab.setAttribute("aria-selected",String(daily));
+  summaryPanel.hidden=daily;dailyPanel.hidden=!daily;
+  if(daily)renderAdminMultiBarangayDailyTrend();
+}
+function renderAdminMultiBarangayDailyTrend(){
+  const target=$("adminMultiBarangayDailyTrend");if(!target)return;
+  const rows=Array.isArray(adminData?.reports)?adminData.reports:[];
+  const todayKey=reportAnalyticsDateKey(new Date().toISOString());
+  const today=new Date(todayKey+"T12:00:00+08:00");
+  const days=[];
+  for(let i=6;i>=0;i--){const dt=new Date(today);dt.setDate(today.getDate()-i);const key=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;days.push({key,label:new Intl.DateTimeFormat("en-PH",{timeZone:"Asia/Manila",weekday:"short"}).format(dt)});}
+  const unitNames=[...new Set((adminData?.units||[]).map(u=>String(u["Barangay"]||u.Barangay||u.barangay||u.name||"").trim()).filter(Boolean))];
+  const reportUnits=[...new Set(rows.map(r=>String(r.cemetery||"").trim()).filter(Boolean))];
+  const units=[...new Set([...unitNames,...reportUnits])].sort((a,b)=>a.localeCompare(b));
+  const palette=["#2563eb","#0d9488","#8b5cf6","#db2777","#d97706","#0891b2","#65a30d","#9333ea","#ea580c","#475569","#be123c","#0284c7"];
+  const counts=units.map((unit,index)=>({unit,color:palette[index%palette.length],values:days.map(day=>rows.filter(r=>String(r.cemetery||"").trim()===unit&&reportAnalyticsDateKey(r.reportDate||r.timestamp||r.date||"")===day.key).length)}));
+  const totalByDay=days.map((day,i)=>counts.reduce((sum,item)=>sum+item.values[i],0));
+  const max=Math.max(1,...counts.flatMap(x=>x.values));
+  const W=900,H=360,L=48,R=20,T=24,B=48,plotW=W-L-R,plotH=H-T-B;
+  const x=i=>L+(plotW/(Math.max(1,days.length-1)))*i;const y=v=>T+plotH-(v/max)*plotH;
+  const grid=[0,Math.ceil(max/2),max].filter((v,i,a)=>a.indexOf(v)===i);
+  const lines=counts.map(item=>{const path=item.values.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");return `<path d="${path}" fill="none" stroke="${item.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${item.values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${item.color}"><title>${esc(item.unit)} · ${days[i].key}: ${v} report(s)</title></circle>`).join("")}`}).join("");
+  const legend=counts.map(item=>`<span style="display:inline-flex;align-items:center;gap:6px;margin:4px 12px 4px 0;font-size:12px"><i style="width:10px;height:10px;border-radius:50%;background:${item.color};display:inline-block"></i>${esc(item.unit)}</span>`).join("");
+  const ranked=counts.map(item=>({unit:item.unit,total:item.values.reduce((a,b)=>a+b,0),color:item.color})).sort((a,b)=>b.total-a.total||a.unit.localeCompare(b.unit));
+  target.innerHTML=`<div class="card" style="margin-bottom:14px"><div class="section-head"><div><h3>📈 Daily Heat-Related Illness Trend</h3><p>Daily submitted reports across all barangays · last 7 days · Philippine Time</p></div><span class="status ok">All Barangays</span></div><div style="width:100%;overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily heat-related illness reports by barangay" style="display:block;width:100%;min-width:620px;height:auto">${grid.map(v=>`<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#e5eaf1" stroke-dasharray="4 4"/><text x="${L-10}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#64748b">${v}</text>`).join("")}${lines}${days.map((d,i)=>`<text x="${x(i)}" y="${H-16}" text-anchor="middle" font-size="11" fill="#64748b">${d.label}</text>`).join("")}</svg></div><div style="display:flex;flex-wrap:wrap;margin-top:8px">${legend||'<span style="color:var(--muted);font-size:12px">No barangay report data available.</span>'}</div><div class="report-analytics-kpis" style="margin-top:12px"><div class="report-analytics-stat"><span>Total Reports · Last 7 Days</span><strong>${analyticsCount(totalByDay.reduce((a,b)=>a+b,0))}</strong><small>All barangays combined</small></div><div class="report-analytics-stat"><span>Barangays With Reports</span><strong>${analyticsCount(ranked.filter(x=>x.total>0).length)}</strong><small>With at least one report in the last 7 days</small></div></div></div><div class="card"><div class="section-head"><div><h3>Barangay Ranking</h3><p>Based on report totals within the displayed 7-day period.</p></div></div>${ranked.length?`<div class="table-wrap"><table><thead><tr><th>Barangay</th><th>Reports · 7 Days</th></tr></thead><tbody>${ranked.map(x=>`<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${x.color};margin-right:8px"></span>${esc(x.unit)}</td><td><strong>${analyticsCount(x.total)}</strong></td></tr>`).join("")}</tbody></table></div>`:'<p>No barangays found.</p>'}</div>`;
+}
+
 function renderAdminReports(){
   const rows=adminData.reports||[];
   if(!isOfflineSession && cacheRefreshNoticeText && !rows.length){
@@ -3912,10 +3945,20 @@ function renderAdminReports(){
   };
   // Default range is all records; date fields are optional and do not exclude older reports.
   $("adminReportsPage").innerHTML=`
-    <div class="section-head"><div><h2>All Reports</h2><p>Reporting & analytics · Operational activity and patient demographics.</p></div><div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button type="button" class="btn" onclick="exportAdminReportsCsv()" title="Export report rows currently matching the selected filters">⬇ Export CSV</button><button type="button" class="btn primary" onclick="openReportTypeManager()">⚙ Manage Report Types</button></div></div>
+    <div class="section-head"><div><h2>All Reports</h2><p>Reporting & analytics · Operational activity and patient demographics.</p></div><div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button type="button" class="btn" onclick="exportAdminReportsCsv()" title="Export report rows currently matching the selected filters">⬇ Export CSV</button></div></div>
+    <div class="report-tabs" role="tablist" aria-label="Reports and analytics views" style="margin:0 0 14px">
+      <button type="button" id="adminAnalyticsTabSummary" class="report-tab active" role="tab" aria-selected="true" aria-controls="adminAnalyticsSummaryPanel" onclick="switchAdminAnalyticsTab('summary')">1. Reports &amp; Analytics</button>
+      <button type="button" id="adminAnalyticsTabDaily" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsDailyPanel" onclick="switchAdminAnalyticsTab('daily')">2. 📈 Daily Heat-Related Illness Trend</button>
+    </div>
+    <section id="adminAnalyticsSummaryPanel" class="report-tab-panel">
     <div class="card report-analytics-filters"><div class="report-analytics-filter-title"><div><b>Report Filters</b><small>Unit/date filters update the charts and summary cards. The Report Type filter narrows the table.</small></div><button type="button" class="btn" onclick="resetAdminReportFilters()">Reset filters</button></div><div class="filters"><select id="reportUnitFilter" aria-label="Filter by unit"><option value="">All Units</option>${unitOptions.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join("")}</select><select id="reportTypeFilter" aria-label="Filter table by report type"><option value="">All Types</option>${allTypes.map(type=>`<option value="${esc(type)}">${esc(type==="Other"?"Other (legacy records)":type)}</option>`).join("")}</select><label class="report-date-filter"><span>From date</span><input id="reportDateFrom" type="date" aria-label="From date"></label><label class="report-date-filter"><span>To date</span><input id="reportDateTo" type="date" aria-label="To date"></label></div><p class="analytics-filter-note">The Report Type filter narrows the table. The report-type chart continues to show the full breakdown for the selected unit and date range. Demographic charts use available records in PATIENTS.</p></div>
     <div id="adminReportAnalytics" class="admin-report-analytics" aria-live="polite"></div>
-    <div class="card report-table-card"><div class="report-table-heading"><div><h3>Report Records</h3><p>Details in this table follow all selected filters.</p></div><span id="adminReportResultCount" class="report-result-count">0 records</span></div><div id="adminReportTable"></div></div>`;
+    <div class="card report-table-card"><div class="report-table-heading"><div><h3>Report Records</h3><p>Details in this table follow all selected filters.</p></div><span id="adminReportResultCount" class="report-result-count">0 records</span></div><div id="adminReportTable"></div></div>
+    </section>
+    <section id="adminAnalyticsDailyPanel" class="report-tab-panel" hidden>
+      <div id="adminMultiBarangayDailyTrend"></div>
+    </section>`;
+  renderAdminMultiBarangayDailyTrend();
   ["reportUnitFilter","reportTypeFilter","reportDateFrom","reportDateTo"].forEach(id=>$(id).addEventListener("change",filterAdminReports));
   filterAdminReports();
 }
