@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.10",
-    "url":  "https://github.com/nmax07152020-sudo/ikonek/releases/download/ota-v1.0.10/ota-v1.0.10.zip",
-    "checksum":  "99037d0c5417c7293bd48c50bf583c8700ca6ab5b2a666a966cbc6c04386cdaa",
-    "notes":  "new report system"
+    "version":  "1.0.11",
+    "url":  "https://github.com/nmax07152020-sudo/ikonek/releases/download/ota-v1.0.11/ota-v1.0.11.zip",
+    "checksum":  "dc822c9aa2833ad1915d7d4efefd5410da3ab068af4b212268ac746f8e18e686",
+    "notes":  "new updates admin and bhw dashboard"
 }
