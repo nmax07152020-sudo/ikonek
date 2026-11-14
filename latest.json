@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.9",
-    "url":  "https://github.com/nmax07152020-sudo/ikonek/releases/download/ota-v1.0.9/ota-v1.0.9.zip",
-    "checksum":  "3250966f45b765eeb91a06640eadd843f9df5dcdd73da1f544871a7988f51750",
-    "notes":  "HTML OTA update 1.0.9"
+    "version":  "1.0.10",
+    "url":  "https://github.com/nmax07152020-sudo/ikonek/releases/download/ota-v1.0.10/ota-v1.0.10.zip",
+    "checksum":  "99037d0c5417c7293bd48c50bf583c8700ca6ab5b2a666a966cbc6c04386cdaa",
+    "notes":  "new report system"
 }
