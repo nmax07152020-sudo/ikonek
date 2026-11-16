@@ -480,6 +480,11 @@ body.night-theme .empty{color:#a8b8ce}
 */
 const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxTs7_jSzhArOe1HnW8C6jlT0Fgbx-kHOipb-dzmxwu1yR8ALVEy1ZDlNtNuAY6CNc/exec";
 const START_DATE = new Date(2026,0,1);
+// KPI data contract with Code.gs:
+// hospitalTally[] = Column A hospital, Column B date (ISO yyyy-MM-dd), Column G remarks.
+// hospitalTotalEntries / hospitalCoordinatedTotal / hospitalRefusedTotal are
+// backend totals for the full Jan-2026+ range; the visible KPI cards follow monthFilter.
+// homevisitDoneTotal = exact normalized "Done Visit" values in Homevisit Column M.
 let rawPatients=[], rawHospitals=[], rawInquiries=[], hospitalDirectory=[], homevisitDoneTotal=0, selectedMonth="all", patientRecords=[];
 const ADMIN_SESSION_KEY="antipolo_patient_navigation_admin_session";
 let adminToken=(()=>{try{return sessionStorage.getItem(ADMIN_SESSION_KEY)||"";}catch(e){return "";}})();
@@ -645,7 +650,7 @@ async function submitSheetEntry(event,kind){
   const response=await fetch("/api/admin",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify(requestBody)});
   const result=await response.json();if(!response.ok||!result.success)throw new Error(result.message||"Unable to save record.");
   message.className="entry-message";message.textContent=(kind==="patient"&&editingPatientRow?"Updated record in row ":"Saved successfully to row ")+result.row+".";
-  if(kind==="patient"&&editingPatientRow){resetPatientEntryMode();loadPatientRecords();}form.reset();setDefaultEntryDates();loadDashboard();
+  if(kind==="patient"&&editingPatientRow){resetPatientEntryMode();loadPatientRecords();}form.reset();setDefaultEntryDates();loadDashboard(true);
   showSaveToast(cfg.title,cfg.success+" Saved in row "+result.row+".",false);
  }catch(err){message.className="entry-message";message.textContent="";showSaveToast("Unable to save record",err.message||"Save failed. Please try again.",true);}
  finally{button.disabled=false;button.textContent=cfg.buttonText;}
@@ -666,8 +671,8 @@ function renderDashboard(){
  const female=p.filter(x=>/^f/i.test(String(x.gender||"").trim())).length;
  const pedia=p.filter(x=>/pedia/i.test(String(x.classification||""))).length;
  const adult=p.filter(x=>/adult/i.test(String(x.classification||""))).length;
- const coordinated=h.filter(x=>/coordinated/i.test(String(x.remarks||""))).length;
- const refused=h.filter(x=>/refused/i.test(String(x.remarks||""))).length;
+ const coordinated=h.filter(x=>String(x.remarks||"").trim().toLowerCase().replace(/\s+/g," ")==="coordinated").length;
+ const refused=h.filter(x=>String(x.remarks||"").trim().toLowerCase().replace(/\s+/g," ")==="refused").length;
  $("hospitalTotalTop").textContent=number(h.filter(x=>String(x.hospital||"").trim()).length);
  $("homevisitDoneTotalTop").textContent=number(homevisitDoneTotal);
  $("inquiriesTotalTop").textContent=number(rawInquiries.filter(x=>String(x.query||"").trim()).length);
@@ -822,6 +827,7 @@ function changePassword(e){
 }
 let dashboardHasConnected=false;
 let dashboardRequestInFlight=false;
+let dashboardRefreshQueued=false;
 function setConnectionStatus(message,state){$("dataStatus").textContent=message;const line=$("dataStatus").closest(".statusline");line.classList.remove("online","connecting","error");line.classList.add(state);$("statusDot").classList.toggle("off",state!=="online");}
 function applyData(data){
  if(!data||!data.success)throw new Error((data&&data.message)||"Apps Script returned an invalid data response.");
@@ -836,21 +842,29 @@ function renderHospitalDirectory(){
  $("hospitalDirectoryBody").innerHTML=rows.map(x=>`<tr><td>${escapeHtml(x.hospital||x.name||"")}</td><td>${escapeHtml(x.contact||"")}</td></tr>`).join("")||'<tr><td colspan="2" class="empty">No hospital directory records found</td></tr>';
 }
 
-function loadDashboard(){
+function finishDashboardRequest(){
+ dashboardRequestInFlight=false;
+ if(dashboardRefreshQueued){
+  dashboardRefreshQueued=false;
+  setTimeout(()=>loadDashboard(false),150);
+ }
+}
+function loadDashboard(forceRefresh=false){
+ // A save may finish while an earlier poll is still running. Queue one fresh read.
+ if(dashboardRequestInFlight){if(forceRefresh)dashboardRefreshQueued=true;return;}
  // Show Connecting only before the first successful connection. Scheduled refreshes
  // run silently so the Online indicator does not flicker every 30 seconds.
- if(dashboardRequestInFlight)return;
  if(!dashboardHasConnected)setConnectionStatus("Connecting…","connecting");
  dashboardRequestInFlight=true;
  if(window.google&&google.script&&google.script.run){
-  google.script.run.withSuccessHandler(data=>{try{applyData(data);}catch(e){setConnectionStatus("Data error: "+e.message,"error");}finally{dashboardRequestInFlight=false;}}).withFailureHandler(err=>{dashboardRequestInFlight=false;setConnectionStatus("Connection error: "+(err.message||err),"error");}).getDashboardData();
+  google.script.run.withSuccessHandler(data=>{try{applyData(data);}catch(e){setConnectionStatus("Data error: "+e.message,"error");}finally{finishDashboardRequest();}}).withFailureHandler(err=>{finishDashboardRequest();setConnectionStatus("Connection error: "+(err.message||err),"error");}).getDashboardData();
   return;
  }
- if(!GAS_WEB_APP_URL){dashboardRequestInFlight=false;setConnectionStatus("Connection error: Apps Script URL is not configured.","error");return;}
+ if(!GAS_WEB_APP_URL){finishDashboardRequest();setConnectionStatus("Connection error: Apps Script URL is not configured.","error");return;}
  const cb="gasCallback_"+Date.now(),script=document.createElement("script");
- window[cb]=data=>{try{applyData(data);}catch(e){setConnectionStatus("Data error: "+e.message,"error");}finally{dashboardRequestInFlight=false;delete window[cb];script.remove();}};
+ window[cb]=data=>{try{applyData(data);}catch(e){setConnectionStatus("Data error: "+e.message,"error");}finally{finishDashboardRequest();delete window[cb];script.remove();}};
  script.src=GAS_WEB_APP_URL+(GAS_WEB_APP_URL.includes("?")?"&":"?")+"callback="+cb+"&t="+Date.now();
- script.onerror=()=>{dashboardRequestInFlight=false;setConnectionStatus("Connection failed. Check Apps Script deployment and permissions.","error");delete window[cb];script.remove();};document.body.appendChild(script);
+ script.onerror=()=>{finishDashboardRequest();setConnectionStatus("Connection failed. Check Apps Script deployment and permissions.","error");delete window[cb];script.remove();};document.body.appendChild(script);
 }
 window.addEventListener("keydown",e=>{if(e.key==="Escape")closeHospitalModal();});
 window.addEventListener("resize",()=>{if($("publicView").style.display!=="none"&&rawPatients.length)renderDashboard();});
