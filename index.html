@@ -161,6 +161,8 @@ footer{text-align:center;color:#8b99ab;font-size:11px;padding:22px 10px 8px}.emp
  #adminView{display:block!important}
  #adminView .admin-shell{display:block!important;min-height:0!important}
  #adminView .admin-sidebar,#adminView .admin-mobile-menu-toggle,#adminView .admin-main>section:not(#adminDashboardMount),.admin-report-toolbar,.topbar,footer{display:none!important}
+ /* Explicitly exclude the Settings panel and password form from dashboard PDF output. */
+ #adminView #admin-password-settings,#adminView #sidebarSettingsLink{display:none!important;visibility:hidden!important}
  #adminDashboardMount{display:block!important}
  #adminDashboardMount #publicView{display:block!important;padding:0!important;margin:0!important}
  #adminDashboardMount #publicView>.welcome{display:none!important}
