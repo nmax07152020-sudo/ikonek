@@ -47,7 +47,20 @@ button{cursor:pointer}
 
 
 .app{display:flex;min-height:100vh}.sidebar{width:246px;background:linear-gradient(180deg,var(--nav),var(--nav2));color:#fff;position:fixed;inset:0 auto 0 0;padding:16px 11px;z-index:50;overflow:auto}.sidebar .brand{display:flex;gap:10px;align-items:center;padding:7px 9px 18px;border-bottom:1px solid rgba(255,255,255,.12)}.sidebar .brand img{width:46px;height:46px;object-fit:contain;border-radius:13px;background:#fff}.sidebar .brand b{font-size:13px;display:block}.sidebar .brand small{font-size:9px;color:#b9cde6}
-.nav{display:grid;gap:6px;margin-top:16px}.nav button{border:0;background:transparent;color:#dceafa;padding:11px 12px;border-radius:11px;text-align:left;font-weight:800;font-size:11px;display:flex;gap:10px;align-items:center;width:100%}.nav button:hover{background:rgba(255,255,255,.08)}.nav button.active{background:linear-gradient(90deg,#1187f0,#0c64c6);color:#fff}.nav .ico{width:22px;text-align:center;font-size:16px;flex-shrink:0}
+.nav{display:grid;gap:6px;margin-top:16px}.nav button{border:0;background:transparent;color:#dceafa;padding:11px 12px;border-radius:11px;text-align:left;font-weight:800;font-size:11px;display:flex;gap:10px;align-items:center;width:100%}.nav button:hover{background:rgba(255,255,255,.08)}.nav button.active{background:linear-gradient(90deg,#1187f0,#0c64c6);color:#fff} .nav .ico{width:22px;text-align:center;font-size:16px;flex-shrink:0}
+.nav button.update-nav{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);margin-top:4px;color:#fff}
+.nav button.update-nav .update-dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:#6ee7a7;flex:none}
+.nav button.update-nav.update-available .update-dot{background:#ffd166;box-shadow:0 0 0 3px rgba(255,209,102,.16)}
+.nav button.update-nav.update-error .update-dot{background:#ff8a8a}
+.update-modal-version{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#f8fbff;font-size:12px}
+.update-modal-version b{font-variant-numeric:tabular-nums}
+.update-result{padding:11px 12px;border-radius:11px;background:#f3f8ff;border:1px solid #cfe1f5;color:#315a7f;font-size:11px;line-height:1.5}
+.update-result.success{background:#edf9f3;border-color:#b9e6cf;color:#087d50}
+.update-result.warn{background:#fff7e6;border-color:#f3d48a;color:#956500}
+.update-result.error{background:#fff1f1;border-color:#ffcaca;color:#a73535}
+.update-check-spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-2px;animation:saveSpin .7s linear infinite;margin-right:6px}
+@media(max-width:1180px){.nav button.update-nav .update-dot{display:none}}
+
 .side-user{margin-top:16px;padding:11px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05)}.side-user b{display:block;font-size:11px}.side-user small{display:block;color:#b9cde6;font-size:9px;margin-top:2px}
 .main{margin-left:246px;width:calc(100% - 246px);min-width:0}.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.hamb{display:none;border:0;background:var(--sky);width:40px;height:40px;border-radius:11px;color:var(--nav);font-size:19px}.top-title{min-width:0;flex:1}.top-title h1{margin:0;font-size:19px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.top-title p{margin:3px 0 0;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-pill{display:flex;align-items:center;gap:8px;padding:6px 9px;background:#f5f8fc;border:1px solid var(--line);border-radius:11px;flex-shrink:0}.session-avatar{width:29px;height:29px;border-radius:9px;background:#dcebff;display:grid;place-items:center;font-size:10px;font-weight:900;color:#0b62bd}.session-pill b{display:block;font-size:10px}.session-pill small{display:block;color:var(--muted);font-size:8px}
 .content{padding:20px;max-width:1550px;margin:auto;min-width:0}.page{display:none!important}.page.active{display:block!important}.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:3px 0 12px}.section-head h2{margin:0;font-size:18px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:10px}.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:17px;min-width:0}
@@ -816,6 +829,20 @@ button{cursor:pointer}
 </div>
 </div>
 
+<!-- VERSION / UPDATE CHECK MODAL -->
+<div id="appUpdateModal" class="modal-backdrop">
+  <div class="modal" style="width:min(480px,100%)">
+    <div class="modal-head"><div><h3 style="margin:0">🔄 Check Updates</h3><p style="margin:4px 0 0;color:var(--muted);font-size:10px">i-KONEK application version</p></div><button type="button" class="close" data-close="appUpdateModal">×</button></div>
+    <div class="modal-body" style="display:grid;gap:10px">
+      <div class="update-modal-version"><span>Installed Version</span><b id="installedAppVersion">v1.0.16</b></div>
+      <div class="update-modal-version"><span>Latest Version</span><b id="latestAppVersion">Not checked</b></div>
+      <div id="appUpdateResult" class="update-result" aria-live="polite">Check GitHub for the latest published version.</div>
+      <button type="button" id="runAppUpdateCheck" class="btn primary" onclick="checkIkonekUpdates(true)">🔄 Check Updates</button>
+      <small style="color:var(--muted);font-size:9px;line-height:1.5">This checks the published version only. It will not install or download an update automatically.</small>
+    </div>
+  </div>
+</div>
+
 <!-- PRIVATE APP -->
 <div id="privateView" class="app hidden">
   <aside id="sidebar" class="sidebar">
@@ -854,7 +881,7 @@ button{cursor:pointer}
       <section id="driverDutyPage" class="page"></section>
       <section id="chatPage" class="page"></section>
       <section id="attendancePage" class="page"></section>
-      <div class="footer-note private-footer">© 2026 • Developed &amp; Maintained by Erwin R. Alincastre</div>
+      <div class="footer-note private-footer">© 2026 • System Developed &amp; Maintained by Erwin R. Alincastre</div>
     </div>
   </main>
 </div>
@@ -1155,6 +1182,9 @@ button{cursor:pointer}
 // Use this same Google Apps Script Web App URL on any static hosting or Android WebView.
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhWhEMNH0u3ko9Wo0KhzhGPS6gwzRXmr5HqmVb-1I1rzy37T37qtkHNHo-Fi0i7UZB/exec";
 const API_URL = WEB_APP_URL;
+// Keep this value in sync with the version currently deployed to the web dashboard.
+const IKONEK_INSTALLED_VERSION = "1.0.16";
+const IKONEK_LATEST_JSON_URL = "https://raw.githubusercontent.com/nmax07152020-sudo/ikonek/main/latest.json";
 const DEFAULT_REPORT_TYPE_OPTIONS = ["Heat Exhaustion / Matinding Pagkapagod Dahil sa Init", "Suspected Heat Stroke / Posibleng Heat Stroke", "Heat Cramps / Pulikat Dahil sa Init", "Dehydration / Kakulangan sa Tubig", "Heat Syncope / Pagkahimatay Dahil sa Init", "Heat-Related Illness / Iba Pang Kaso Dahil sa Init", "Vital Signs Monitoring / Pagsukat ng Vital Signs", "First Aid / Paunang Lunas", "Medical Referral / Pagre-refer sa Ospital o Health Facility"];
 const HEATWATCH_BARANGAYS = ["Bagong Nayon", "Beverly Hills", "Calawis", "Cupang", "Dalig", "Dela Paz", "Inarawan", "Mambugan", "Mayamot", "Muntingdilaw", "San Isidro", "San Jose", "San Juan", "San Luis", "San Roque", "Santa Cruz"];
 let REPORT_TYPE_OPTIONS = DEFAULT_REPORT_TYPE_OPTIONS.slice();
@@ -1912,10 +1942,10 @@ function buildPrivateNav(){
     ["adminReports","▤","Reports & Analytics"],
     ["users","⚙","User Access & Settings"]
   ] : [];
-  const items=[...commonItems,...adminItems,["logout","↪","Logout"]];
-  nav.innerHTML=items.map(x=>`<button type="button" data-page="${x[0]}"><span class="ico">${x[1]}</span><span>${x[2]}</span></button>`).join("");
+  const items=[...commonItems,...adminItems,["checkUpdates","↻","Check Updates"],["logout","↪","Logout"]];
+  nav.innerHTML=items.map(x=>`<button type="button" data-page="${x[0]}" class="${x[0]==="checkUpdates"?"update-nav":""}"><span class="ico">${x[1]}</span><span>${x[2]}</span>${x[0]==="checkUpdates"?"<i class=\"update-dot\" aria-hidden=\"true\"></i>":""}</button>`).join("");
   nav.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>{
-    if(b.dataset.page==="logout") logout(); else navigate(b.dataset.page);
+    if(b.dataset.page==="logout") logout(); else if(b.dataset.page==="checkUpdates"){openModal("appUpdateModal");checkIkonekUpdates(false);} else navigate(b.dataset.page);
   }));
 }
 
@@ -5097,6 +5127,40 @@ async function distributeInventoryStock(){
 async function releaseInventoryToPatient(){
   const payload={itemId:$('inventoryReleaseItem').value,patientName:$('inventoryReleasePatientName').value.trim(),patientId:$('inventoryReleasePatientId').value.trim(),quantity:$('inventoryReleaseQty').value,notes:$('inventoryReleaseNotes').value.trim()};
   try{const res=await apiPost('releaseInventoryToPatient',payload);alert(res.message||'Patient release recorded.');await renderInventoryPage()}catch(e){alert(e.message||e)}
+}
+
+async function checkIkonekUpdates(showLoading=true){
+  const installedEl=$("installedAppVersion"),latestEl=$("latestAppVersion"),resultEl=$("appUpdateResult"),button=$("runAppUpdateCheck");
+  if(installedEl) installedEl.textContent="v"+IKONEK_INSTALLED_VERSION;
+  if(button){button.disabled=true;button.innerHTML='<span class="update-check-spin"></span>Checking…';}
+  if(resultEl){resultEl.className="update-result";resultEl.textContent="Connecting to GitHub and checking latest.json…";}
+  try{
+    const response=await fetch(IKONEK_LATEST_JSON_URL+"?t="+Date.now(),{cache:"no-store",headers:{"Accept":"application/json"}});
+    if(!response.ok) throw new Error("GitHub returned HTTP "+response.status);
+    const manifest=await response.json();
+    const latest=String(manifest.version||"").trim().replace(/^v/i,"");
+    if(!/^\d+(?:\.\d+)*$/.test(latest)) throw new Error("Invalid version value in latest.json");
+    if(latestEl) latestEl.textContent="v"+latest;
+    const compare=(a,b)=>{const aa=a.split(".").map(Number),bb=b.split(".").map(Number);for(let i=0;i<Math.max(aa.length,bb.length);i++){const x=aa[i]||0,y=bb[i]||0;if(x!==y)return x>y?1:-1;}return 0;};
+    const cmp=compare(latest,IKONEK_INSTALLED_VERSION);
+    const navButton=document.querySelector('#privateNav [data-page="checkUpdates"]');
+    if(cmp>0){
+      if(resultEl){resultEl.className="update-result warn";resultEl.innerHTML='<b>🟡 Update available!</b><br>Installed: v'+esc(IKONEK_INSTALLED_VERSION)+' · Latest: v'+esc(latest)+'<br><span style="font-size:10px">'+esc(manifest.notes||"A newer version has been published.")+'</span>'+(manifest.url?'<br><a href="'+esc(manifest.url)+'" target="_blank" rel="noopener">View update package</a>':'');}
+      if(navButton){navButton.classList.add("update-available");navButton.classList.remove("update-error");}
+    }else if(cmp===0){
+      if(resultEl){resultEl.className="update-result success";resultEl.innerHTML='<b>✅ You are up to date.</b><br>Installed and latest version are both v'+esc(latest)+'.';}
+      if(navButton){navButton.classList.remove("update-available","update-error");}
+    }else{
+      if(resultEl){resultEl.className="update-result";resultEl.innerHTML='Installed version is newer than the public latest.json (v'+esc(latest)+'). Verify the release manifest.';}
+      if(navButton){navButton.classList.remove("update-available","update-error");}
+    }
+    return {installed:IKONEK_INSTALLED_VERSION,latest,notes:manifest.notes||"",url:manifest.url||"",status:cmp>0?"update-available":cmp===0?"up-to-date":"installed-newer"};
+  }catch(error){
+    if(latestEl) latestEl.textContent="Unavailable";
+    if(resultEl){resultEl.className="update-result error";resultEl.textContent="Unable to check updates. Please check your internet connection and try again. Details: "+(error.message||error);}
+    const navButton=document.querySelector('#privateNav [data-page="checkUpdates"]');if(navButton)navButton.classList.add("update-error");
+    return {status:"error",error:String(error.message||error)};
+  }finally{if(button){button.disabled=false;button.textContent="🔄 Check Updates";}}
 }
 
 async function logout(){
