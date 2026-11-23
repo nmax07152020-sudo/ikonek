@@ -3808,7 +3808,7 @@ function editPatientRecord(patientId){
   tr.innerHTML=`<td>${esc(row.patientId||"")}</td>
     <td>${esc(formatPatientDateTime(row.createdAt))}</td>
     <td><input id="editPatientName" value="${esc(row.fullName||"")}" maxlength="160"></td>
-    <td>${(()=>{const linked=getPatientLinkedReport(row);const selected=String(linked?.type||row.reportType||"").split(/\s*\|\s*/).filter(Boolean);const options=[...new Set([...(REPORT_TYPE_OPTIONS||[]),...selected])];return linked?`<select id="editPatientReportTypes" multiple size="${Math.min(5,Math.max(3,options.length))}" style="min-width:150px;max-width:210px">${options.map(t=>`<option value="${esc(t)}" ${selected.some(x=>x.toLowerCase()===t.toLowerCase())?'selected':''}>${esc(t)}</option>`).join("")}</select><small style="display:block;color:var(--muted)">Ctrl-click to select multiple</small>`:`<span class="patient-report-type-empty">No linked report to edit</span>`})()}</td>
+    <td>${(()=>{const linked=getPatientLinkedReport(row);const selected=String(linked?.type||row.reportType||"").split(/\s*\|\s*/).filter(Boolean);const options=[...new Set([...(REPORT_TYPE_OPTIONS||[]),...selected])];return linked?`<div id="editPatientReportTypes" style="display:grid;gap:7px;min-width:180px;max-width:260px;max-height:210px;overflow:auto;padding:8px;border:1px solid var(--border);border-radius:9px;background:var(--surface,white)">${options.map((t,i)=>`<label style="display:flex;align-items:flex-start;gap:8px;padding:5px 4px;font-size:11px;line-height:1.35;cursor:pointer"><input type="checkbox" class="edit-patient-report-type-check" value="${esc(t)}" ${selected.some(x=>x.toLowerCase()===t.toLowerCase())?'checked':''} style="width:18px;height:18px;min-width:18px;margin:0;accent-color:var(--primary);cursor:pointer"><span>${esc(t)}</span></label>`).join("")}</div><small style="display:block;color:var(--muted);margin-top:5px">Check / uncheck report types</small>`:`<span class="patient-report-type-empty">No linked report to edit</span>`})()}</td>
     <td><div style="display:grid;gap:4px"><input id="editPatientAge" type="number" min="0" max="120" value="${esc(row.age??"")}" placeholder="Age"><select id="editPatientGender"><option value="">Select</option>${['Male','Female'].map(v=>`<option ${String(row.gender||'')===v?'selected':''}>${v}</option>`).join('')}</select></div></td>
     <td><input id="editPatientAddress" value="${esc(row.address||"")}" maxlength="500"></td>
     <td><input id="editPatientContact" value="${esc(row.contactNumber||"")}" maxlength="40"></td>
@@ -3822,7 +3822,7 @@ async function savePatientRecord(patientId){
   const patientSource=currentUser.role==="ADMIN"?(adminData?.patients||[]):(currentUnitData?.patients||[]);
   const patientRow=patientSource.find(r=>String(r.patientId||"").trim()===String(patientId||"").trim());
   const linkedReport=patientRow?getPatientLinkedReport(patientRow):null;
-  const selectedTypes=Array.from($('editPatientReportTypes')?.selectedOptions||[]).map(o=>o.value);
+  const selectedTypes=Array.from(document.querySelectorAll('#editPatientReportTypes .edit-patient-report-type-check:checked')).map(o=>o.value);
   if(linkedReport && $('editPatientReportTypes') && !selectedTypes.length){alert("Select at least one Report Type.");return;}
   const data={patientId,fullName:$('editPatientName')?.value.trim(),age:$('editPatientAge')?.value,gender:$('editPatientGender')?.value,address:$('editPatientAddress')?.value.trim(),contactNumber:$('editPatientContact')?.value.trim()};
   if(!data.fullName){alert("Patient name is required.");return;}
