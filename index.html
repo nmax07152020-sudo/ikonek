@@ -55,7 +55,7 @@ button{cursor:pointer}
 .grid{display:grid;gap:14px}.grid.two{grid-template-columns:1.4fr .8fr}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 .mini-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.mini{border:1px solid var(--line);background:#fbfdff;border-radius:13px;padding:12px}.mini span{display:block;color:var(--muted);font-size:9px}.mini b{display:block;font-size:18px;margin-top:3px}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.filters select,.filters input{min-width:180px}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}table{width:100%;min-width:760px;border-collapse:collapse}th,td{padding:10px 11px;border-bottom:1px solid var(--line);font-size:10px;text-align:left}th{background:#f5f8fc;color:#5d7089;font-size:8px;text-transform:uppercase;letter-spacing:.45px}tr:last-child td{border-bottom:0}.status{display:inline-block;border-radius:999px;padding:5px 7px;font-size:8px;font-weight:900}.status.ok{background:#e9f8f0;color:#087d50}.status.warn{background:#fff4d9;color:#996400}.status.off{background:#f0f2f5;color:#657389}.actions{display:flex;gap:6px;flex-wrap:wrap}
-.patient-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.patient-summary .mini{background:#f8fbff}.patient-table table{min-width:1200px}.patient-id{font-family:Consolas,monospace;font-size:9px;font-weight:900;color:#0b67c7}.patient-name-cell b{font-size:10px}.patient-name-cell small{display:block;color:var(--muted);font-size:8px;margin-top:2px;line-height:1.35;max-width:220px;overflow-wrap:anywhere}.patient-private{font-size:9px;line-height:1.4;color:#52657c}.patient-private strong{color:var(--text)}
+.patient-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.patient-summary .mini{background:#f8fbff}.patient-table table{min-width:1200px}.patient-id{font-family:Consolas,monospace;font-size:9px;font-weight:900;color:#0b67c7}.patient-name-cell b{font-size:10px}.patient-name-cell small{display:block;color:var(--muted);font-size:8px;margin-top:2px;line-height:1.35;max-width:220px;overflow-wrap:anywhere}.patient-private{font-size:9px;line-height:1.4;color:#52657c}.patient-private strong{color:var(--text)}.patient-report-type-list{display:flex;flex-wrap:wrap;gap:4px;min-width:150px;max-width:260px}.patient-report-type-chip{display:inline-block;padding:4px 7px;border-radius:7px;background:#eaf4ff;border:1px solid #cfe3fb;color:#14558e;font-size:9px;font-weight:800;line-height:1.35;white-space:normal}.patient-report-status{display:block;width:100%;color:var(--muted);font-size:8px;margin-top:2px}.patient-report-type-empty{color:var(--muted);font-size:9px;font-style:italic}
 @media(max-width:820px){.patient-summary{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.patient-summary{grid-template-columns:1fr}.patient-table table{min-width:1050px}}
 .driver-status-note{background:#f5f9ff;border:1px solid #d9e8f7;border-radius:12px;padding:11px 12px;font-size:9px;color:#526b83;line-height:1.5}.driver-roster{display:grid;gap:10px}.driver-card{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff;display:grid;gap:7px}.driver-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.driver-card h3{margin:0;font-size:13px}.driver-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.driver-meta div{background:#f7fafd;border-radius:10px;padding:8px}.driver-meta span{display:block;color:var(--muted);font-size:8px}.driver-meta b{display:block;font-size:10px;margin-top:2px;overflow-wrap:anywhere}.driver-task{border-top:1px solid var(--line);padding-top:8px;font-size:9px;color:#52657c;line-height:1.45}.driver-task b{color:var(--text)}
@@ -706,6 +706,18 @@ button{cursor:pointer}
 }
 </style>
 
+<style id="ikonek-report-multiselect-css">
+.report-type-multi{position:relative;width:100%;min-width:0}
+.report-type-multi-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);padding:10px 12px;min-height:40px;font-size:11px}
+.report-type-multi-trigger span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.report-type-multi-menu{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:80;max-height:260px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 35px rgba(10,40,75,.18);padding:7px}
+.report-type-multi-menu[hidden]{display:none!important}
+.report-type-multi-option{display:flex;align-items:flex-start;gap:9px;padding:9px 7px;border-radius:8px;font-size:11px;line-height:1.35;color:var(--text);cursor:pointer}
+.report-type-multi-option:hover{background:#f1f7ff}
+.report-type-multi-option input{width:17px;height:17px;flex:0 0 17px;margin:0;accent-color:var(--blue)}
+.report-type-multi-empty{padding:12px;color:var(--muted);font-size:10px}
+@media(max-width:700px){.report-type-multi-menu{max-height:45vh}.report-type-multi-option{padding:10px 7px;font-size:12px}}
+</style>
 </head>
 <body>
 <div id="ikonekSplash" role="dialog" aria-label="i-KONEK welcome screen" aria-modal="true">
@@ -1141,7 +1153,6 @@ button{cursor:pointer}
 <script>
 // i-Konek V22 GAS DIRECT TEST — portable backend configuration.
 // Use this same Google Apps Script Web App URL on any static hosting or Android WebView.
-// TEST ONLY: replace with the NEW Apps Script TEST deployment URL before publishing this HTML.
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwhWhEMNH0u3ko9Wo0KhzhGPS6gwzRXmr5HqmVb-1I1rzy37T37qtkHNHo-Fi0i7UZB/exec";
 const API_URL = WEB_APP_URL;
 const DEFAULT_REPORT_TYPE_OPTIONS = ["Heat Exhaustion / Matinding Pagkapagod Dahil sa Init", "Suspected Heat Stroke / Posibleng Heat Stroke", "Heat Cramps / Pulikat Dahil sa Init", "Dehydration / Kakulangan sa Tubig", "Heat Syncope / Pagkahimatay Dahil sa Init", "Heat-Related Illness / Iba Pang Kaso Dahil sa Init", "Vital Signs Monitoring / Pagsukat ng Vital Signs", "First Aid / Paunang Lunas", "Medical Referral / Pagre-refer sa Ospital o Health Facility"];
@@ -1159,17 +1170,36 @@ function applyReportTypesFromData(data){
 function syncReportTypeSelect(){
   const select=$("reportType");
   if(!select) return;
-  const prior=select.value;
+  const selected=Array.from(select.selectedOptions||[]).map(o=>o.value);
   select.innerHTML=REPORT_TYPE_OPTIONS.map(type=>`<option value="${esc(type)}">${esc(type)}</option>`).join("");
-  if(REPORT_TYPE_OPTIONS.includes(prior)) select.value=prior;
+  selected.filter(x=>REPORT_TYPE_OPTIONS.includes(x)).forEach(x=>{const o=Array.from(select.options).find(y=>y.value===x);if(o)o.selected=true;});
+  renderReportTypeMultiOptions();
 }
+function selectedReportTypes(){const s=$("reportType");return s?Array.from(s.selectedOptions||[]).map(o=>o.value):[];}
+function updateReportTypeMultiSummary(){const el=$("reportTypeMultiSummary");if(!el)return;const v=selectedReportTypes();el.textContent=v.length?v.join(", "):"Select report type(s)";el.title=el.textContent;}
+function renderReportTypeMultiOptions(){
+  const menu=$("reportTypeMultiMenu");if(!menu)return;
+  const selected=new Set(selectedReportTypes());
+  menu.innerHTML=REPORT_TYPE_OPTIONS.map(type=>`<label class="report-type-multi-option"><input type="checkbox" value="${esc(type)}" ${selected.has(type)?"checked":""} onchange="changeReportTypeSelection(this)"><span>${esc(type)}</span></label>`).join("")||'<div class="report-type-multi-empty">No report types available.</div>';
+  updateReportTypeMultiSummary();
+}
+function changeReportTypeSelection(input){
+  const s=$("reportType");if(!s)return;
+  const o=Array.from(s.options).find(x=>x.value===input.value);if(o)o.selected=!!input.checked;
+  s.setCustomValidity(selectedReportTypes().length?"":"Select at least one report type.");updateReportTypeMultiSummary();
+}
+function toggleReportTypeMenu(force){
+  const menu=$("reportTypeMultiMenu"),trigger=$("reportTypeMultiTrigger");if(!menu||!trigger)return;
+  const open=typeof force==="boolean"?force:menu.hidden;menu.hidden=!open;trigger.setAttribute("aria-expanded",String(open));
+}
+document.addEventListener("click",event=>{const wrap=$("reportTypeMulti");if(wrap&&!wrap.contains(event.target))toggleReportTypeMenu(false);});
 
 const LOGO = "assets/icon-512.png";
 const LOCAL_UNITS = [{"group": 1, "name": "Himlayang Katoliko / Sta Elena Memorial Park / Antipolo Public Cemetery 1", "covered": ["Himlayang Katoliko", "Sta Elena Memorial Park", "Antipolo Public Cemetery 1 (Besides Sta. Elena Memorial Park)"]}, {"group": 2, "name": "Our Lady of Peace Crematorium and Columbarium 1 / Antipolo Public Cemetery 2 / Antipolo Public Cemetery 3", "covered": ["Our Lady of Peace Crematorium and Columbarium 1", "Antipolo Public Cemetery 2", "Antipolo Public Cemetery 3 (Infront of Antipolo Public Cemetery 2)"]}, {"group": 3, "name": "Our Lady of Peace Memorial Park 2 / Our Lady of Peace Memorial Park 3", "covered": ["Our Lady of Peace Memorial Park 2", "Our Lady of Peace Memorial Park 3 (Infront of OLPMP 2)"]}, {"group": 4, "name": "Transfiguration of Christ Parish Church", "covered": ["Transfiguration of Christ Parish Church"]}, {"group": 5, "name": "Pantay Public Cemetery", "covered": ["Pantay Public Cemetery"]}, {"group": 6, "name": "Boso-Boso Public Cemetery", "covered": ["Boso-Boso Public Cemetery"]}, {"group": 7, "name": "Heaven’s Gate 2 Memorial Park", "covered": ["Heaven’s Gate 2 Memorial Park"]}, {"group": 8, "name": "Loyola Gardens of Antipolo", "covered": ["Loyola Gardens of Antipolo"]}, {"group": 9, "name": "Providence Memorial Park", "covered": ["Providence Memorial Park"]}, {"group": 10, "name": "Sto. Rosario Memorial Park", "covered": ["Sto. Rosario Memorial Park"]}, {"group": 11, "name": "Heaven’s Gate 1 Memorial Park", "covered": ["Heaven’s Gate 1 Memorial Park"]}, {"group": 12, "name": "Gethsemane Memorial Park", "covered": ["Gethsemane Memorial Park"]}, {"group": 13, "name": "Haven of Angels Memorial and Crematorium", "covered": ["Haven of Angels Memorial and Crematorium"]}, {"group": 14, "name": "Valley of Sympathy Memorial Park", "covered": ["Valley of Sympathy Memorial Park"]}];
 const LOCAL_SHIFTS = [{"id": "S1", "date": "October 31, 2026", "period": "2:00 PM - 10:00 PM", "coverage": "Oct. 31"}, {"id": "S2", "date": "Oct. 31 - Nov. 1, 2026", "period": "10:00 PM - 6:00 AM", "coverage": "Oct. 31 - Nov. 1"}, {"id": "S3", "date": "November 1, 2026", "period": "6:00 AM - 2:00 PM", "coverage": "Nov. 1"}, {"id": "S4", "date": "November 1, 2026", "period": "2:00 PM - 10:00 PM", "coverage": "Nov. 1"}, {"id": "S5", "date": "Nov. 1 - 2, 2026", "period": "10:00 PM - 6:00 AM", "coverage": "Nov. 1 - 2"}];
 let currentUser = null;
-// The server-issued bearer token is kept in sessionStorage only so a page refresh
-// can restore the same tab's session. Passwords are never stored for session restore.
+// The server-issued bearer token is kept in localStorage so a refresh or browser restart
+// can restore the validated session. Passwords are never stored for session restore.
 let token = "";
 let adminData = null;
 let currentUnitData = null;
@@ -1238,25 +1268,25 @@ const OFFLINE_AUTH_TTL_MS=72*60*60*1000; // 72 hours; requires a fresh online lo
 let offlineDbPromise=null;
 let syncInFlight=null;
 let isOfflineSession=false;
-const SESSION_RESTORE_STORAGE_KEY="OPLAN_KALULUWA_SESSION_RESTORE_V1";
+const SESSION_RESTORE_STORAGE_KEY="IKONEK_AUTH_SESSION_RESTORE_V2";
 let sessionRestoreInFlight=null;
 
 function persistSessionForRefresh(){
   try{
     if(!token || !currentUser || isOfflineSession){
-      sessionStorage.removeItem(SESSION_RESTORE_STORAGE_KEY);
+      localStorage.removeItem(SESSION_RESTORE_STORAGE_KEY);
       return;
     }
     // Store only the server-issued token; restore the user profile from the server.
-    sessionStorage.setItem(SESSION_RESTORE_STORAGE_KEY,JSON.stringify({token:String(token),savedAt:Date.now()}));
+    localStorage.setItem(SESSION_RESTORE_STORAGE_KEY,JSON.stringify({token:String(token),savedAt:Date.now()}));
   }catch(err){console.warn("Session refresh persistence is unavailable in this browser tab.",err);}
 }
 function clearPersistedSessionForRefresh(){
-  try{sessionStorage.removeItem(SESSION_RESTORE_STORAGE_KEY);}catch(err){}
+  try{localStorage.removeItem(SESSION_RESTORE_STORAGE_KEY);}catch(err){}
 }
 function readPersistedSessionForRefresh(){
   try{
-    const raw=sessionStorage.getItem(SESSION_RESTORE_STORAGE_KEY);
+    const raw=localStorage.getItem(SESSION_RESTORE_STORAGE_KEY);
     if(!raw)return null;
     const saved=JSON.parse(raw);
     if(!saved || typeof saved.token!=="string" || !saved.token.trim()){
@@ -3087,11 +3117,16 @@ function renderReportPage(){
         <div class="card report-main-card"><form id="reportForm" class="report-form">
           <div class="form-title">1. BARANGAY DETAILS</div>
           <div class="form-grid two"><div class="field"><label>Barangay <span>*</span></label>${unitsHtml}</div><div class="field"><label>Submitted By</label><input value="${esc(reporter)}" readonly></div></div>
-          <div class="form-grid two"><div class="field"><label>Report Type <span>*</span></label><select id="reportType" required>${REPORT_TYPE_OPTIONS.map(type=>`<option value="${esc(type)}">${esc(type)}</option>`).join("")}</select></div><div class="field"><label>Status <span>*</span></label><select id="reportStatus" required><option value="Manageable">Manageable</option><option value="Consultation / Medical Evaluation">Consultation / Medical Evaluation</option><option value="Immediate Transfer / Referral">Immediate Transfer / Referral</option></select></div></div>
+          <div class="form-grid two"><div class="field"><label>Report Type <span>*</span></label><div class="report-type-multi" id="reportTypeMulti"><button type="button" class="report-type-multi-trigger" id="reportTypeMultiTrigger" aria-expanded="false" onclick="toggleReportTypeMenu()"><span id="reportTypeMultiSummary">Select report type(s)</span><span aria-hidden="true">⌄</span></button><div class="report-type-multi-menu" id="reportTypeMultiMenu" hidden></div></div><select id="reportType" multiple hidden aria-hidden="true" tabindex="-1"></select></div><div class="field"><label>Status <span>*</span></label><select id="reportStatus" required><option value="Manageable">Manageable</option><option value="Consultation / Medical Evaluation">Consultation / Medical Evaluation</option><option value="Immediate Transfer / Referral">Immediate Transfer / Referral</option></select></div></div>
           <div class="form-title">2. PATIENT INFORMATION</div>
           <div class="form-grid three"><div class="field"><label>Patient Name</label><input id="patientName" placeholder="Full name"></div><div class="field"><label>Age</label><input id="patientAge" type="number" min="0" max="120" step="0.01" placeholder="Age in years (e.g. 0.05 for under 1 month)"></div><div class="field"><label>Gender</label><select id="patientGender"><option value="">Select</option><option>Male</option><option>Female</option></select></div></div>
           <div class="form-grid two"><div class="field"><label>Address</label><input id="patientAddress" placeholder="Address"></div><div class="field"><label>Contact Number</label><input id="patientContact" type="tel" inputmode="tel" placeholder="09XXXXXXXXX"></div></div>
-          <div class="form-title">3. SYMPTOMS / SINTOMAS</div>
+          <div class="form-title">3. MEDICAL HISTORY / KASAYSAYANG MEDIKAL</div>
+          <div class="field"><label for="patientMedicalHistory">Past Medical History</label><textarea id="patientMedicalHistory" placeholder="Previous illnesses, hypertension, diabetes, asthma, heart disease, etc."></textarea></div>
+          <div class="field"><label for="patientMedicines">Medicine Taken / Maintenance Medications</label><textarea id="patientMedicines" placeholder="Medicine name, dosage, frequency, and last intake (if known)."></textarea></div>
+          <div class="field"><label for="patientAllergies">Known Allergies</label><input id="patientAllergies" placeholder="Medicine, food, or other known allergies. Type None if no known allergies."></div>
+          <div class="notice">Optional fields. Leave blank if unknown. Record only information relevant to patient care.</div>
+          <div class="form-title">4. SYMPTOMS / SINTOMAS</div>
           <div class="field"><label>Symptoms / Sintomas <span>*</span></label><textarea id="reportDetails" required placeholder="Describe the patient’s symptoms, signs, and complaints. / Ilarawan ang mga sintomas at nararamdaman ng pasyente."></textarea></div>
           <div class="field"><label>Action Taken</label><textarea id="reportAction" placeholder="Assessment, first aid, medicine given, referral, etc."></textarea></div>
           <button id="submitReportBtn" type="submit" class="btn primary">Submit Report</button>
@@ -3110,6 +3145,7 @@ function renderReportPage(){
       </div>
     </section>`}`;
   bindReportForm();
+  syncReportTypeSelect();
   if(!locked && unit) savedAdminUnit=unit;
 }
 
@@ -3141,11 +3177,6 @@ function renderReportSummary(unit){
   if(Number(t?.Other||0)>0) summaryTypes.push("Other (legacy records)");
   $("reportSummaryBox").innerHTML=`<div class="summary-list"><div class="sum"><span>Total Reports</span><b>${t?.totalReports||0}</b></div><div class="sum"><span>Persons Assisted</span><b>${t?.totalPersons||0}</b></div>${summaryTypes.map(x=>{const key=x==="Other (legacy records)"?"Other":x;return `<div class="sum"><span>${esc(x)}</span><b>${t?.[key]||0}</b></div>`}).join("")}</div>`;
 }
-function selectedReportTypes(){const s=$("reportType");return s?Array.from(s.selectedOptions||[]).map(o=>o.value):[];}
-function updateReportTypeMultiSummary(){const el=$("reportTypeMultiSummary");if(!el)return;const v=selectedReportTypes();el.textContent=v.length?v.join(", "):"Select report type(s)";el.title=el.textContent;}
-function renderReportTypeMultiOptions(){const menu=$("reportTypeMultiMenu");if(!menu)return;const selected=new Set(selectedReportTypes());menu.innerHTML=REPORT_TYPE_OPTIONS.map(type=>`<label class="report-type-multi-option"><input type="checkbox" value="${esc(type)}" ${selected.has(type)?"checked":""} onchange="changeReportTypeSelection(this)"><span>${esc(type)}</span></label>`).join("");updateReportTypeMultiSummary();}
-function changeReportTypeSelection(input){const s=$("reportType");if(!s)return;const o=Array.from(s.options).find(x=>x.value===input.value);if(o)o.selected=!!input.checked;s.setCustomValidity(selectedReportTypes().length?"":"Select at least one report type.");updateReportTypeMultiSummary();}
-function toggleReportTypeMenu(force){const menu=$("reportTypeMultiMenu"),trigger=$("reportTypeMultiTrigger");if(!menu||!trigger)return;const open=typeof force==="boolean"?force:menu.hidden;menu.hidden=!open;trigger.setAttribute("aria-expanded",String(open));}
 function bindReportForm(){
   $("reportForm").addEventListener("submit",async e=>{
     e.preventDefault();
@@ -3160,7 +3191,7 @@ function bindReportForm(){
         type:selectedReportTypes().join(" | "),count:1,status:$("reportStatus").value,
         details:$("reportDetails").value.trim(),actionTaken:$("reportAction").value.trim(),
         localReportId:generateLocalReportId(),
-        patientId:"",patient:{fullName:patientName,age:patientAge,gender:$("patientGender").value,address:$("patientAddress").value.trim(),contactNumber:$("patientContact").value.trim()}
+        patientId:"",patient:{fullName:patientName,age:patientAge,gender:$("patientGender").value,address:$("patientAddress").value.trim(),contactNumber:$("patientContact").value.trim(),medicalHistory:$("patientMedicalHistory").value.trim(),medicinesTaken:$("patientMedicines").value.trim(),knownAllergies:$("patientAllergies").value.trim()}
       };
       let out;
       let queuedOffline=false;
@@ -3202,6 +3233,7 @@ function bindReportForm(){
           try{await syncPendingReports()}catch(syncErr){console.warn("Pending report sync deferred.",syncErr)}
         })();
       }
+      navigate("dashboard");
     }catch(err){alert(err.message)}finally{btn.disabled=false;btn.textContent="Submit Report"}
   });
 }
@@ -3711,23 +3743,19 @@ function renderPatientRecordsPage(){
 function getPatientLinkedReport(patient){
   const linkedId=String(patient?.linkedReportId||"").trim();
   const patientId=String(patient?.patientId||"").trim();
-  const reports=currentUser?.role==="ADMIN"?(adminData?.reports||[]):(currentUnitData?.reports||[]);
-  // Prefer the explicit Linked Report ID; fall back to Patient ID so the
-  // Report Type remains visible if a legacy/reused patient row has an old link.
+  const reports=currentUser?.role==="ADMIN" ? (adminData?.reports||[]) : (currentUnitData?.reports||[]);
+  // Prefer the explicit Linked Report ID. If a legacy/reused PATIENTS row has
+  // a missing or stale link, match the report's Patient ID as a safe fallback.
   return reports.find(report=>linkedId && String(report.reportId||"").trim()===linkedId)
     || reports.find(report=>patientId && String(report.patientId||"").trim()===patientId)
     || null;
 }
-function normalizePatientReportTypes(value){
-  if(Array.isArray(value))return [...new Set(value.map(x=>String(x||"").trim()).filter(Boolean))];
-  let raw=String(value||"").trim();if(!raw)return [];
-  if(raw[0]==="["){try{const parsed=JSON.parse(raw);if(Array.isArray(parsed))return normalizePatientReportTypes(parsed);}catch(e){}}
-  return [...new Set(raw.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean))];
-}
+
 function renderPatientReportType(patient){
   const report=getPatientLinkedReport(patient);
-  const types=normalizePatientReportTypes(report?.type||patient?.reportType);
-  if(!types.length)return '<span class="patient-report-type-empty">No linked report type</span>';
+  const raw=String(report?.type||patient?.reportType||"").trim();
+  if(!raw) return '<span class="patient-report-type-empty">No linked report type</span>';
+  const types=[...new Set(raw.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean))];
   const chips=types.map(type=>`<span class="patient-report-type-chip">${esc(type)}</span>`).join("");
   const status=String(report?.status||"").trim();
   return `<div class="patient-report-type-list">${chips}${status?`<small class="patient-report-status">Status: ${esc(status)}</small>`:""}</div>`;
@@ -3740,7 +3768,8 @@ function filterPatientRecords(){
   const unit=isAdmin ? ($('patientUnitFilter')?.value||"") : (currentUser?.unit||"");
   if(unit) rows=rows.filter(r=>String(r.cemetery||"")===unit);
   if(q) rows=rows.filter(r=>[
-    r.patientId,r.fullName,r.contactNumber,r.address,r.linkedReportId,r.recordedBy,r.notes,r.gender,r.age,r.cemetery,getPatientLinkedReport(r)?.type,getPatientLinkedReport(r)?.status
+    r.patientId,r.fullName,r.contactNumber,r.address,r.linkedReportId,r.recordedBy,r.notes,r.gender,r.age,r.cemetery,
+    getPatientLinkedReport(r)?.type,getPatientLinkedReport(r)?.status
   ].some(v=>String(v??"").toLowerCase().includes(q)));
 
   const countEl=$("patientRecordCount");
@@ -3754,17 +3783,17 @@ function filterPatientRecords(){
   }
 
   $("patientRecordTable").innerHTML=`<div class="table-wrap"><table><thead><tr>
-    <th>Patient ID</th><th>Created</th><th>Patient</th><th>Age / Gender</th><th>Address</th><th>Contact</th><th>Unit</th><th>Report ID</th><th>Report Type</th><th>Recorded By</th><th>Action</th>
+    <th>Patient ID</th><th>Created</th><th>Patient</th><th>Report Type</th><th>Age / Gender</th><th>Address</th><th>Contact</th><th>Unit</th><th>Report ID</th><th>Recorded By</th><th>Action</th>
   </tr></thead><tbody>${rows.slice().reverse().map(r=>`<tr>
     <td><span class="patient-id">${esc(r.patientId||"-")}</span></td>
     <td>${esc(formatPatientDateTime(r.createdAt))}</td>
     <td class="patient-name-cell"><b>${esc(r.fullName||"-")}</b><small>${esc(r.notes||"")}</small></td>
+    <td>${renderPatientReportType(r)}</td>
     <td>${esc(r.age||"-")} / ${esc(r.gender||"-")}</td>
     <td><div class="patient-private">${esc(r.address||"-")}</div></td>
     <td>${esc(r.contactNumber||"-")}</td>
     <td>${esc(r.cemetery||"-")}</td>
     <td><span class="patient-id">${esc(r.linkedReportId||"-")}</span></td>
-    <td>${renderPatientReportType(r)}</td>
     <td>${esc(r.recordedBy||"-")}</td>
     <td><div class="actions"><button type="button" class="btn" onclick="editPatientRecord('${esc(r.patientId||"")}')">Edit</button>${isAdmin?`<button type="button" class="btn danger" onclick="deletePatientRecord('${esc(r.patientId||"")}')">Delete</button>`:""}</div></td>
   </tr>`).join("")}</tbody></table></div>`;
@@ -3780,10 +3809,11 @@ function editPatientRecord(patientId){
   tr.innerHTML=`<td>${esc(row.patientId||"")}</td>
     <td>${esc(formatPatientDateTime(row.createdAt))}</td>
     <td><input id="editPatientName" value="${esc(row.fullName||"")}" maxlength="160"></td>
+    <td>${renderPatientReportType(row)}</td>
     <td><div style="display:grid;gap:4px"><input id="editPatientAge" type="number" min="0" max="120" value="${esc(row.age??"")}" placeholder="Age"><select id="editPatientGender"><option value="">Select</option>${['Male','Female'].map(v=>`<option ${String(row.gender||'')===v?'selected':''}>${v}</option>`).join('')}</select></div></td>
     <td><input id="editPatientAddress" value="${esc(row.address||"")}" maxlength="500"></td>
     <td><input id="editPatientContact" value="${esc(row.contactNumber||"")}" maxlength="40"></td>
-    <td>${esc(row.cemetery||"")}</td><td>${esc(row.linkedReportId||"")}</td><td>${renderPatientReportType(row)}</td><td>${esc(row.recordedBy||"")}</td>
+    <td>${esc(row.cemetery||"")}</td><td>${esc(row.linkedReportId||"")}</td><td>${esc(row.recordedBy||"")}</td>
     <td><div class="actions"><button class="btn primary" onclick="savePatientRecord('${esc(row.patientId)}')">Save</button><button class="btn" onclick="filterPatientRecords()">Cancel</button></div></td>`;
 }
 
@@ -3925,11 +3955,11 @@ async function removeReportType(name){
 
 function switchAdminAnalyticsTab(tab){
   const daily=tab==="daily";
-  const summaryTab=$("adminAnalyticsTabSummary"),dailyTab=$("adminAnalyticsTabDaily");
   const summaryPanel=$("adminAnalyticsSummaryPanel"),dailyPanel=$("adminAnalyticsDailyPanel");
-  if(!summaryTab||!dailyTab||!summaryPanel||!dailyPanel)return;
-  summaryTab.classList.toggle("active",!daily);dailyTab.classList.toggle("active",daily);
-  summaryTab.setAttribute("aria-selected",String(!daily));dailyTab.setAttribute("aria-selected",String(daily));
+  if(!summaryPanel||!dailyPanel)return;
+  ["adminAnalyticsTabSummary","adminAnalyticsTabDaily","adminAnalyticsTabWeekly","adminAnalyticsTabMonthly","adminAnalyticsTabYearly","adminAnalyticsTabTrend"].forEach(id=>{const el=$(id);if(el){el.classList.remove("active");el.setAttribute("aria-selected","false")}});
+  const active=$(daily?"adminAnalyticsTabTrend":"adminAnalyticsTabSummary");
+  if(active){active.classList.add("active");active.setAttribute("aria-selected","true")}
   summaryPanel.hidden=daily;dailyPanel.hidden=!daily;
   if(daily)renderAdminMultiBarangayDailyTrend();
 }
@@ -3968,7 +3998,7 @@ function renderAdminReports(){
   }
   const units=Array.isArray(adminData.units)?adminData.units:[];
   const unitOptions=[...new Set(units.map(u=>String(u["Barangay"]||"").trim()).filter(Boolean))];
-  const allTypes=[...new Set([...(REPORT_TYPE_OPTIONS||[]),...rows.map(r=>String(r.type||"").trim()).filter(Boolean)])];
+  const allTypes=[...new Set([...(REPORT_TYPE_OPTIONS||[]),...rows.flatMap(r=>String(r.type||"").split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean))])];
   const dateValue=(d)=>{
     if(!d)return "";
     const s=String(d).trim();
@@ -3983,8 +4013,12 @@ function renderAdminReports(){
   $("adminReportsPage").innerHTML=`
     <div class="section-head"><div><h2>All Reports</h2><p>Reporting & analytics · Operational activity and patient demographics.</p></div><div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button type="button" class="btn" onclick="exportAdminReportsCsv()" title="Export report rows currently matching the selected filters">⬇ Export CSV</button></div></div>
     <div class="report-tabs" role="tablist" aria-label="Reports and analytics views" style="margin:0 0 14px">
-      <button type="button" id="adminAnalyticsTabSummary" class="report-tab active" role="tab" aria-selected="true" aria-controls="adminAnalyticsSummaryPanel" onclick="switchAdminAnalyticsTab('summary')">1. Reports &amp; Analytics</button>
-      <button type="button" id="adminAnalyticsTabDaily" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsDailyPanel" onclick="switchAdminAnalyticsTab('daily')">2. 📈 Daily Heat-Related Illness Trend</button>
+      <button type="button" id="adminAnalyticsTabSummary" class="report-tab active" role="tab" aria-selected="true" aria-controls="adminAnalyticsSummaryPanel" onclick="switchAdminAnalyticsTab('summary')">All Reports</button>
+      <button type="button" id="adminAnalyticsTabDaily" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsSummaryPanel" onclick="setAdminReportPeriod('daily')">Daily</button>
+      <button type="button" id="adminAnalyticsTabWeekly" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsSummaryPanel" onclick="setAdminReportPeriod('weekly')">Weekly</button>
+      <button type="button" id="adminAnalyticsTabMonthly" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsSummaryPanel" onclick="setAdminReportPeriod('monthly')">Monthly</button>
+      <button type="button" id="adminAnalyticsTabYearly" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsSummaryPanel" onclick="setAdminReportPeriod('yearly')">Yearly</button>
+      <button type="button" id="adminAnalyticsTabTrend" class="report-tab" role="tab" aria-selected="false" aria-controls="adminAnalyticsDailyPanel" onclick="switchAdminAnalyticsTab('daily')">Daily Heat-Related Illness Trend</button>
     </div>
     <section id="adminAnalyticsSummaryPanel" class="report-tab-panel">
     <div class="card report-analytics-filters"><div class="report-analytics-filter-title"><div><b>Report Filters</b><small>Unit/date filters update the charts and summary cards. The Report Type filter narrows the table.</small></div><button type="button" class="btn" onclick="resetAdminReportFilters()">Reset filters</button></div><div class="filters"><select id="reportUnitFilter" aria-label="Filter by unit"><option value="">All Units</option>${unitOptions.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join("")}</select><select id="reportTypeFilter" aria-label="Filter table by report type"><option value="">All Types</option>${allTypes.map(type=>`<option value="${esc(type)}">${esc(type==="Other"?"Other (legacy records)":type)}</option>`).join("")}</select><label class="report-date-filter"><span>From date</span><input id="reportDateFrom" type="date" aria-label="From date"></label><label class="report-date-filter"><span>To date</span><input id="reportDateTo" type="date" aria-label="To date"></label></div><p class="analytics-filter-note">The Report Type filter narrows the table. The report-type chart continues to show the full breakdown for the selected unit and date range. Demographic charts use available records in PATIENTS.</p></div>
@@ -3997,6 +4031,23 @@ function renderAdminReports(){
   renderAdminMultiBarangayDailyTrend();
   ["reportUnitFilter","reportTypeFilter","reportDateFrom","reportDateTo"].forEach(id=>$(id).addEventListener("change",filterAdminReports));
   filterAdminReports();
+}
+function setAdminReportPeriod(period){
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Manila",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const p={};parts.forEach(x=>p[x.type]=x.value);
+  const today=`${p.year}-${p.month}-${p.day}`,[yy,mm,dd]=today.split("-").map(Number);
+  const base=new Date(Date.UTC(yy,mm-1,dd,12));let from=today,to=today;
+  if(period==="weekly"){
+    const offset=(base.getUTCDay()+6)%7,monday=new Date(base);monday.setUTCDate(base.getUTCDate()-offset);
+    const sunday=new Date(monday);sunday.setUTCDate(monday.getUTCDate()+6);
+    from=monday.toISOString().slice(0,10);to=sunday.toISOString().slice(0,10);
+  }else if(period==="monthly"){
+    from=`${p.year}-${p.month}-01`;to=new Date(Date.UTC(yy,mm,0,12)).toISOString().slice(0,10);
+  }else if(period==="yearly"){from=`${p.year}-01-01`;to=`${p.year}-12-31`;}
+  $("reportDateFrom").value=from;$("reportDateTo").value=to;
+  ["adminAnalyticsTabSummary","adminAnalyticsTabDaily","adminAnalyticsTabWeekly","adminAnalyticsTabMonthly","adminAnalyticsTabYearly","adminAnalyticsTabTrend"].forEach(id=>{const el=$(id);if(el){el.classList.remove("active");el.setAttribute("aria-selected","false")}});
+  const active=$("adminAnalyticsTab"+period.charAt(0).toUpperCase()+period.slice(1));if(active){active.classList.add("active");active.setAttribute("aria-selected","true")}
+  $("adminAnalyticsSummaryPanel").hidden=false;$("adminAnalyticsDailyPanel").hidden=true;filterAdminReports();
 }
 function resetAdminReportFilters(){
   ["reportUnitFilter","reportTypeFilter","reportDateFrom","reportDateTo"].forEach(id=>{const el=$(id);if(el)el.value="";});
@@ -4061,7 +4112,7 @@ function getAdminReportRowsByContext(){
 function getFilteredAdminReportRows(){
   let rows=getAdminReportRowsByContext();
   const type=$("reportTypeFilter")?.value||"";
-  if(type)rows=rows.filter(r=>String(r.type||"")===type);
+  if(type)rows=rows.filter(r=>String(r.type||"").split(/\s*\|\s*/).includes(type));
   return rows;
 }
 
@@ -4155,8 +4206,8 @@ function renderAdminReportAnalytics(contextRows){
   const totalPeople=rows.reduce((sum,r)=>sum+(Number(r.count)||0),0);
   const unitCount=new Set(rows.map(r=>String(r.cemetery||"")).filter(Boolean)).size;
   const totalPatients=patients.length;
-  const typeSet=new Set([...(REPORT_TYPE_OPTIONS||[]),...rows.map(r=>String(r.type||"").trim()).filter(Boolean)]);
-  const typeCounts=[...typeSet].map(label=>({label,value:rows.filter(r=>String(r.type||"")===label).length})).sort((a,b)=>b.value-a.value||a.label.localeCompare(b.label));
+  const typeSet=new Set([...(REPORT_TYPE_OPTIONS||[]),...rows.flatMap(r=>String(r.type||"").split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean))]);
+  const typeCounts=[...typeSet].map(label=>({label,value:rows.filter(r=>String(r.type||"").split(/\s*\|\s*/).includes(label)).length})).sort((a,b)=>b.value-a.value||a.label.localeCompare(b.label));
   const unitCounts=[...new Set(rows.map(r=>String(r.cemetery||"").trim()).filter(Boolean))].map(label=>({label,value:rows.filter(r=>String(r.cemetery||"").trim()===label).length})).sort((a,b)=>b.value-a.value||a.label.localeCompare(b.label)).slice(0,10);
   const genderBuckets=[{label:"Female",value:0},{label:"Male",value:0}];
   patients.forEach(p=>{
@@ -5050,6 +5101,12 @@ startPublicAutoRefresh();
 // Revalidate a prior online session on every page load. If its server token is still
 // valid, restore the role dashboard; if expired, return to normal login without a loop.
 void restoreSessionAfterPageRefresh();
+// Keep the rolling server session alive during long-running staff sessions.
+window.setInterval(()=>{
+  if(currentUser && token && !isOfflineSession && navigator.onLine){
+    apiPost("refreshSession",{},true).catch(err=>console.warn("Session renewal deferred.",err));
+  }
+},12*60*60*1000);
 </script>
 
 <style id="dynamic-report-types-emergency-css">
