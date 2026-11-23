@@ -3813,28 +3813,34 @@ function editPatientRecord(patientId){
     <td><input id="editPatientAddress" value="${esc(row.address||"")}" maxlength="500"></td>
     <td><input id="editPatientContact" value="${esc(row.contactNumber||"")}" maxlength="40"></td>
     <td>${esc(row.cemetery||"")}</td><td>${esc(row.linkedReportId||"")}</td><td>${esc(row.recordedBy||"")}</td>
-    <td><div class="actions"><button class="btn primary" onclick="savePatientRecord('${esc(row.patientId)}')">Save</button><button class="btn" onclick="filterPatientRecords()">Cancel</button></div></td>`;
+    <td><div class="actions"><button type="button" id="editPatientSaveBtn" class="btn primary" onclick="savePatientRecord('${esc(row.patientId)}')">Save</button><button type="button" class="btn" onclick="filterPatientRecords()">Cancel</button></div></td>`;
 }
 
 async function savePatientRecord(patientId){
   if(!["ADMIN","TEAM_LEADER"].includes(currentUser?.role)) { alert("You are not authorized to edit patient records."); return; }
   if(isOfflineSession || navigator.onLine===false){ alert("Patient editing is unavailable offline. Please reconnect to the internet."); return; }
+  const saveBtn=$("editPatientSaveBtn");
+  const originalSaveHtml=saveBtn?.innerHTML||"Save";
+  if(saveBtn){saveBtn.disabled=true;saveBtn.innerHTML='<span class="save-loading-spinner" style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:saveSpin .7s linear infinite;vertical-align:-2px;margin-right:7px"></span>Saving…';}
   const patientSource=currentUser.role==="ADMIN"?(adminData?.patients||[]):(currentUnitData?.patients||[]);
   const patientRow=patientSource.find(r=>String(r.patientId||"").trim()===String(patientId||"").trim());
   const linkedReport=patientRow?getPatientLinkedReport(patientRow):null;
   const selectedTypes=Array.from(document.querySelectorAll('#editPatientReportTypes .edit-patient-report-type-check:checked')).map(o=>o.value);
-  if(linkedReport && $('editPatientReportTypes') && !selectedTypes.length){alert("Select at least one Report Type.");return;}
+  if(linkedReport && $("editPatientReportTypes") && !selectedTypes.length){if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=originalSaveHtml;}alert("Select at least one Report Type.");return;}
   const data={patientId,fullName:$('editPatientName')?.value.trim(),age:$('editPatientAge')?.value,gender:$('editPatientGender')?.value,address:$('editPatientAddress')?.value.trim(),contactNumber:$('editPatientContact')?.value.trim()};
-  if(!data.fullName){alert("Patient name is required.");return;}
+  if(!data.fullName){if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=originalSaveHtml;}alert("Patient name is required.");return;}
   try{
-    const result=await apiPost(currentUser.role==="ADMIN"?"adminupdatepatient":"updatepatient",data);
+    await apiPost(currentUser.role==="ADMIN"?"adminupdatepatient":"updatepatient",data);
     if(linkedReport && selectedTypes.length){
       await apiPost(currentUser.role==="ADMIN"?"adminupdatereporttypes":"bhwupdatereporttypes",{reportId:linkedReport.reportId,reportTypes:selectedTypes});
     }
     await loadRoleData(true);
     renderPatientRecordsPage();
     alert("Patient record and linked Report Type updated successfully.");
-  }catch(err){alert("Unable to save patient record: "+(err.message||err));}
+  }catch(err){
+    alert("Unable to save patient record: "+(err.message||err));
+    if(saveBtn?.isConnected){saveBtn.disabled=false;saveBtn.innerHTML=originalSaveHtml;}
+  }
 }
 
 async function deletePatientRecord(patientId){
