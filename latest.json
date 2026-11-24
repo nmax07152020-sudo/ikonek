@@ -1,6 +1,6 @@
 {
-    "version":  "1.0.17",
-    "url":  "https://github.com/nmax07152020-sudo/ikonek/releases/download/ota-v1.0.17/ota-v1.0.17.zip",
-    "checksum":  "6f6c33433ed6c9fbebf8dce86f583aeaae143d0fa5290422eb2719e4917a6dfb",
-    "notes":  "check updates"
+    "version":  "1.0.18",
+    "url":  "https://github.com/nmax07152020-sudo/ikonek/releases/download/ota-v1.0.18/ota-v1.0.18.zip",
+    "checksum":  "44c1d19b54f8f99a23a5d8312e52bdf8bca0ef7a072be9c9114338b64926599d",
+    "notes":  "symptoms and action taken"
 }
