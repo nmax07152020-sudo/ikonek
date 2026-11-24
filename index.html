@@ -838,7 +838,7 @@ button{cursor:pointer}
       <div class="update-modal-version"><span>Latest Version</span><b id="latestAppVersion">Not checked</b></div>
       <div id="appUpdateResult" class="update-result" aria-live="polite">Check GitHub for the latest published version.</div>
       <button type="button" id="runAppUpdateCheck" class="btn primary" onclick="checkIkonekUpdates(true)">🔄 Check Updates</button>
-      <small style="color:var(--muted);font-size:9px;line-height:1.5">This checks the published version only. It will not install or download an update automatically.</small>
+      <small style="color:var(--muted);font-size:9px;line-height:1.5">View-only version checker for the Android app. It shows whether a newer version is available; it will not download or install anything.</small>
     </div>
   </div>
 </div>
@@ -877,11 +877,12 @@ button{cursor:pointer}
       <section id="inventoryPage" class="page"></section>
       <section id="personnelPage" class="page"></section>
       <section id="usersPage" class="page"></section>
+      <section id="checklistSettingsPage" class="page"></section>
       <section id="adminReportsPage" class="page"></section>
       <section id="driverDutyPage" class="page"></section>
       <section id="chatPage" class="page"></section>
       <section id="attendancePage" class="page"></section>
-      <div class="footer-note private-footer">© 2026 • System Developed &amp; Maintained by Erwin R. Alincastre</div>
+      <div class="footer-note private-footer">© 2026 • Developed &amp; Maintained by Erwin R. Alincastre</div>
     </div>
   </main>
 </div>
@@ -1176,6 +1177,31 @@ button{cursor:pointer}
 .attendance-unit-metrics span{display:block;font-size:8px;color:var(--muted)}.attendance-unit-metrics b{font-size:13px}
 @media(max-width:800px){.attendance-form-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:540px){.attendance-form-grid,.attendance-photo-grid,.attendance-roster{grid-template-columns:1fr}.attendance-unit-nav{display:grid;grid-template-columns:1fr 1fr}.attendance-unit-nav button{text-align:left;overflow-wrap:anywhere}.attendance-record-head{flex-direction:column}}
+
+.report-option-dropdown{position:relative;margin:7px 0 12px;z-index:1}.report-option-dropdown.is-open{z-index:80}.report-option-dropdown-trigger{width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit;text-align:left;cursor:pointer;touch-action:manipulation}.report-option-dropdown-trigger:focus-visible{outline:2px solid #3b82f6;outline-offset:2px}.report-option-dropdown-trigger .summary{font-size:10px;color:var(--muted);overflow-wrap:anywhere}.report-option-dropdown-menu{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:100;margin:0;padding:9px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 30px rgba(10,35,65,.20);max-height:min(280px,48vh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.report-option-dropdown-menu[hidden]{display:none}.report-option-checklist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.report-option-checklist label{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#f8fbff;font-size:10px;line-height:1.4;cursor:pointer;min-width:0}
+.report-option-checklist input{width:auto;min-width:16px;margin:1px 0 0;accent-color:#064088}
+.report-option-hint{font-size:9px;color:var(--muted);margin:3px 0 7px}
+.report-option-manager{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px}
+.report-option-manager h4{margin:0 0 8px;font-size:12px}
+.report-option-manager-list{display:grid;gap:6px}
+.report-option-manager-row{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:9px;padding:8px;font-size:10px}
+.report-option-manager-row span{min-width:0;overflow-wrap:anywhere}
+@media(max-width:600px){.report-option-checklist{grid-template-columns:1fr}.report-option-manager-row{align-items:flex-start;flex-direction:column}}
+
+/* Symptoms / Action Taken dropdown: match the compact Report Type multi-select */
+.report-option-dropdown{position:relative!important;width:100%;min-width:0;margin:7px 0 10px;z-index:2}
+.report-option-dropdown.is-open{z-index:120!important}
+.report-option-dropdown-trigger{width:100%;min-height:40px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:10px 12px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:#fff!important;color:var(--text)!important;font:inherit!important;font-size:11px!important;text-align:left!important;cursor:pointer;box-shadow:none!important}
+.report-option-dropdown-trigger .summary{display:block!important;min-width:0;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:11px!important;color:var(--muted)!important}
+.report-option-dropdown-menu{position:absolute!important;top:calc(100% + 5px)!important;left:0!important;right:0!important;z-index:130!important;display:block;background:#fff!important;border:1px solid var(--line)!important;border-radius:12px!important;box-shadow:0 14px 35px rgba(10,40,75,.18)!important;padding:7px!important;margin:0!important;max-height:260px!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.report-option-dropdown-menu[hidden]{display:none!important}
+.report-option-checklist{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:2px!important;width:100%!important}
+.report-option-checklist label{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;padding:9px 7px!important;border:0!important;border-radius:8px!important;background:#fff!important;color:var(--text)!important;font-size:11px!important;font-weight:400!important;line-height:1.35!important;text-align:left!important;cursor:pointer!important}
+.report-option-checklist label:hover{background:#f1f7ff!important}
+.report-option-checklist label input[type=checkbox]{display:block!important;position:static!important;flex:0 0 17px!important;width:17px!important;height:17px!important;min-width:17px!important;margin:0!important;padding:0!important;accent-color:var(--blue)!important}
+.report-option-checklist label span{display:block!important;flex:1 1 auto!important;min-width:0!important;text-align:left!important;overflow-wrap:anywhere!important;color:var(--text)!important}
+@media(max-width:700px){.report-option-dropdown-menu{max-height:45vh!important}.report-option-checklist label{padding:10px 7px!important;font-size:12px!important}}
 </style>
 <script>
 // i-Konek V22 GAS DIRECT TEST — portable backend configuration.
@@ -1188,6 +1214,71 @@ const IKONEK_LATEST_JSON_URL = "https://raw.githubusercontent.com/nmax07152020-s
 const DEFAULT_REPORT_TYPE_OPTIONS = ["Heat Exhaustion / Matinding Pagkapagod Dahil sa Init", "Suspected Heat Stroke / Posibleng Heat Stroke", "Heat Cramps / Pulikat Dahil sa Init", "Dehydration / Kakulangan sa Tubig", "Heat Syncope / Pagkahimatay Dahil sa Init", "Heat-Related Illness / Iba Pang Kaso Dahil sa Init", "Vital Signs Monitoring / Pagsukat ng Vital Signs", "First Aid / Paunang Lunas", "Medical Referral / Pagre-refer sa Ospital o Health Facility"];
 const HEATWATCH_BARANGAYS = ["Bagong Nayon", "Beverly Hills", "Calawis", "Cupang", "Dalig", "Dela Paz", "Inarawan", "Mambugan", "Mayamot", "Muntingdilaw", "San Isidro", "San Jose", "San Juan", "San Luis", "San Roque", "Santa Cruz"];
 let REPORT_TYPE_OPTIONS = DEFAULT_REPORT_TYPE_OPTIONS.slice();
+const DEFAULT_SYMPTOM_CHECK_OPTIONS = ['Dizziness / Pagkahilo','Headache / Pananakit ng ulo','Nausea or vomiting / Pagduduwal o pagsusuka','Muscle cramps / Pulikat','Weakness or fatigue / Panghihina o pagkapagod','Excessive sweating / Labis na pagpapawis','Thirst / Uhaw','Fainting / Pagkahimatay','Confusion / Pagkalito','Seizure / Kombulsyon','Hot body / Mainit ang katawan'];
+const DEFAULT_ACTION_CHECK_OPTIONS = ['Initial assessment / Paunang pagsusuri','Vital signs monitored / Sinukat ang vital signs','Moved to a cooler area / Inilipat sa malamig na lugar','Cooling measures provided / Nagbigay ng pagpapalamig','Referred to health facility / Ni-refer sa health facility','Transported to hospital / Dinala sa ospital','Endorsed to healthcare personnel / Iniendorso sa health personnel'];
+let SYMPTOM_CHECK_OPTIONS=DEFAULT_SYMPTOM_CHECK_OPTIONS.slice();
+let ACTION_CHECK_OPTIONS=DEFAULT_ACTION_CHECK_OPTIONS.slice();
+function applyReportFormOptionsFromData(data){
+  if(Array.isArray(data?.symptomOptions)) SYMPTOM_CHECK_OPTIONS=data.symptomOptions.map(x=>String(x||'').trim()).filter(Boolean);
+  if(Array.isArray(data?.actionTakenOptions)) ACTION_CHECK_OPTIONS=data.actionTakenOptions.map(x=>String(x||'').trim()).filter(Boolean);
+}
+function syncChecklistTextarea(checkbox, textareaId){
+  const box=$(textareaId); if(!box)return;
+  const value=String(checkbox.value||'').trim();
+  const lines=box.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const existing=lines.filter(x=>x.toLowerCase()!==value.toLowerCase());
+  if(checkbox.checked) existing.push(value);
+  box.value=[...new Set(existing)].join('\n');
+  updateReportOptionDropdownSummary(textareaId==='reportDetails'?'symptom':'action');
+}
+function toggleReportOptionDropdown(kind){
+  const menu=$(kind==='symptom'?'symptomDropdownMenu':'actionDropdownMenu');
+  const trigger=$(kind==='symptom'?'symptomDropdownTrigger':'actionDropdownTrigger');
+  if(!menu||!trigger)return;
+  const wrap=trigger.closest('.report-option-dropdown');
+  const opening=menu.hidden;
+  // Keep only one checklist open at a time.
+  document.querySelectorAll('.report-option-dropdown').forEach(el=>{
+    const otherMenu=el.querySelector('.report-option-dropdown-menu');
+    const otherTrigger=el.querySelector('.report-option-dropdown-trigger');
+    if(otherMenu&&otherMenu!==menu) otherMenu.hidden=true;
+    if(otherTrigger&&otherTrigger!==trigger) otherTrigger.setAttribute('aria-expanded','false');
+    el.classList.remove('is-open');
+  });
+  menu.hidden=!opening;
+  trigger.setAttribute('aria-expanded',String(opening));
+  if(wrap) wrap.classList.toggle('is-open',opening);
+}
+function closeReportOptionDropdowns(event){
+  if(event && event.target && event.target.closest && event.target.closest('.report-option-dropdown')) return;
+  document.querySelectorAll('.report-option-dropdown').forEach(el=>{
+    const menu=el.querySelector('.report-option-dropdown-menu');
+    const trigger=el.querySelector('.report-option-dropdown-trigger');
+    if(menu) menu.hidden=true;
+    if(trigger) trigger.setAttribute('aria-expanded','false');
+    el.classList.remove('is-open');
+  });
+}
+document.addEventListener('click',closeReportOptionDropdowns);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeReportOptionDropdowns();});
+function updateReportOptionDropdownSummary(kind){
+  const listId=kind==='symptom'?'symptomChecklist':'actionTakenChecklist';
+  const summary=$(kind==='symptom'?'symptomDropdownSummary':'actionDropdownSummary');
+  const checks=Array.from(document.querySelectorAll(`#${listId} input[type="checkbox"]`));
+  const selected=checks.filter(x=>x.checked).length;
+  if(summary) summary.textContent=selected?`${selected} selected`:(kind==='symptom'?'Select symptoms':'Select actions taken');
+}
+function renderReportFormChecklists(){
+  const data=currentUser?.role==='ADMIN'?adminData:currentUnitData;
+  applyReportFormOptionsFromData(data||{});
+  const symptom=$('symptomChecklist'), action=$('actionTakenChecklist');
+  if(symptom) symptom.innerHTML=SYMPTOM_CHECK_OPTIONS.map((x,i)=>`<label><input type="checkbox" value="${esc(x)}" onchange="syncChecklistTextarea(this,'reportDetails')"><span>${esc(x)}</span></label>`).join('')||'<div class="notice">No symptom options configured. Admin can add options in Checklist Settings.</div>';
+  if(action) action.innerHTML=ACTION_CHECK_OPTIONS.map((x,i)=>`<label><input type="checkbox" value="${esc(x)}" onchange="syncChecklistTextarea(this,'reportAction')"><span>${esc(x)}</span></label>`).join('')||'<div class="notice">No action options configured. Admin can add options in Checklist Settings.</div>';
+  updateReportOptionDropdownSummary('symptom');
+  updateReportOptionDropdownSummary('action');
+  renderReportFormOptionManagers();
+}
+
 function applyReportTypesFromData(data){
   if(data && Array.isArray(data.reportTypes)){
     REPORT_TYPE_OPTIONS=[...new Set(data.reportTypes.map(x=>String(x||'').trim()).filter(Boolean))];
@@ -2170,7 +2261,7 @@ document.addEventListener("visibilitychange",()=>{
 
 function navigate(page){
   if(!currentUser) return;
-  const adminOnlyPages=["personnel","users","adminReports"];
+  const adminOnlyPages=["personnel","users","adminReports","checklistSettings"];
   if(adminOnlyPages.includes(page) && currentUser.role!=="ADMIN"){
     alert("Admin access is required for account management and citywide analytics.");
     return;
@@ -3117,17 +3208,21 @@ function renderReportTypeMiniCards(t){
 }
 
 function switchReportTab(tab){
-  const submit=$("reportTabSubmit"), manage=$("reportTabManage");
-  const submitPanel=$("reportSubmitPanel"), managePanel=$("reportManagePanel");
-  if(!submit||!manage||!submitPanel||!managePanel) return;
-  const isManage=tab==="manage";
-  submit.classList.toggle("active",!isManage);
-  manage.classList.toggle("active",isManage);
-  submit.setAttribute("aria-selected",String(!isManage));
-  manage.setAttribute("aria-selected",String(isManage));
-  submitPanel.hidden=isManage;
-  managePanel.hidden=!isManage;
-  if(isManage) renderReportTypeManagerList();
+  const tabs={
+    submit:{button:$("reportTabSubmit"),panel:$ ("reportSubmitPanel")},
+    manage:{button:$ ("reportTabManage"),panel:$ ("reportManagePanel")},
+    checklists:{button:$ ("reportTabChecklists"),panel:$ ("reportChecklistPanel")}
+  };
+  if(!tabs[tab] || !tabs[tab].button || !tabs[tab].panel) return;
+  Object.entries(tabs).forEach(([key,item])=>{
+    if(!item.button||!item.panel)return;
+    const active=key===tab;
+    item.button.classList.toggle("active",active);
+    item.button.setAttribute("aria-selected",String(active));
+    item.panel.hidden=!active;
+  });
+  if(tab==="manage") renderReportTypeManagerList();
+  if(tab==="checklists") renderChecklistSettingsPage();
 }
 function renderReportPage(){
   const locked=currentUser.role==="TEAM_LEADER";
@@ -3141,6 +3236,7 @@ function renderReportPage(){
     ${locked?"":`<div class="report-tabs" role="tablist" aria-label="Report management tabs">
       <button type="button" id="reportTabSubmit" class="report-tab active" role="tab" aria-selected="true" aria-controls="reportSubmitPanel" onclick="switchReportTab('submit')">1. Submit Report</button>
       <button type="button" id="reportTabManage" class="report-tab" role="tab" aria-selected="false" aria-controls="reportManagePanel" onclick="switchReportTab('manage')">2. Manage Report Types</button>
+      <button type="button" id="reportTabChecklists" class="report-tab" role="tab" aria-selected="false" aria-controls="reportChecklistPanel" onclick="switchReportTab('checklists')">3. Symptoms &amp; Action Taken Checklists</button>
     </div>`}
     <section id="reportSubmitPanel" class="report-tab-panel">
       <div class="report-layout">
@@ -3157,8 +3253,8 @@ function renderReportPage(){
           <div class="field"><label for="patientAllergies">Known Allergies</label><input id="patientAllergies" placeholder="Medicine, food, or other known allergies. Type None if no known allergies."></div>
           <div class="notice">Optional fields. Leave blank if unknown. Record only information relevant to patient care.</div>
           <div class="form-title">4. SYMPTOMS / SINTOMAS</div>
-          <div class="field"><label>Symptoms / Sintomas <span>*</span></label><textarea id="reportDetails" required placeholder="Describe the patient’s symptoms, signs, and complaints. / Ilarawan ang mga sintomas at nararamdaman ng pasyente."></textarea></div>
-          <div class="field"><label>Action Taken</label><textarea id="reportAction" placeholder="Assessment, first aid, medicine given, referral, etc."></textarea></div>
+          <div class="field"><label>Symptoms / Sintomas <span>*</span></label><div class="report-option-hint">Tap to open, then check/uncheck all that apply. Selected items will appear in the box below.</div><div class="report-option-dropdown"><button type="button" class="report-option-dropdown-trigger" id="symptomDropdownTrigger" aria-expanded="false" onclick="toggleReportOptionDropdown('symptom')"><span class="summary" id="symptomDropdownSummary">Select symptoms</span><span aria-hidden="true">⌄</span></button><div id="symptomDropdownMenu" class="report-option-dropdown-menu" hidden><div id="symptomChecklist" class="report-option-checklist"></div></div></div><textarea id="reportDetails" required placeholder="Selected symptoms will appear here. You may add more details."></textarea></div>
+          <div class="field"><label>Action Taken</label><div class="report-option-hint">Tap to open, then check/uncheck all actions performed. Selected items will appear in the box below.</div><div class="report-option-dropdown"><button type="button" class="report-option-dropdown-trigger" id="actionDropdownTrigger" aria-expanded="false" onclick="toggleReportOptionDropdown('action')"><span class="summary" id="actionDropdownSummary">Select actions taken</span><span aria-hidden="true">⌄</span></button><div id="actionDropdownMenu" class="report-option-dropdown-menu" hidden><div id="actionTakenChecklist" class="report-option-checklist"></div></div></div><textarea id="reportAction" placeholder="Selected actions will appear here. You may add more details."></textarea></div>
           <button id="submitReportBtn" type="submit" class="btn primary">Submit Report</button>
           <div id="offlineSyncStatus" class="offline-sync-status">● Ready — reports will sync automatically when connection returns.</div>
         </form></div>
@@ -3173,9 +3269,11 @@ function renderReportPage(){
         </form>
         <div id="reportTypeManagerList" style="margin-top:16px"></div>
       </div>
-    </section>`}`;
+    </section>
+    ${locked?"":`<section id="reportChecklistPanel" class="report-tab-panel" hidden></section>`}`}`;
   bindReportForm();
   syncReportTypeSelect();
+  renderReportFormChecklists();
   if(!locked && unit) savedAdminUnit=unit;
 }
 
@@ -3994,6 +4092,65 @@ async function removeReportType(name){
   }finally{
     document.querySelectorAll("#reportTypeManagerList [data-report-type]").forEach(b=>b.disabled=false);
   }
+}
+
+function renderChecklistSettingsPage(){
+  if(currentUser?.role!=="ADMIN") return;
+  const target=$("reportChecklistPanel");
+  if(!target) return;
+  target.innerHTML=`
+    <div class="section-head"><div><h2>Symptoms & Action Taken Checklists</h2><p>Manage the checkbox choices available to BHW users when submitting reports. Changes are saved to Google Sheets.</p></div></div>
+    <div class="card report-main-card">
+      <div class="report-option-manager">
+        <h3>Symptoms / Sintomas Checklist Settings</h3>
+        <p class="report-option-hint">Add, edit, or delete the symptom choices shown in the BHW Symptoms dropdown.</p>
+        <form class="form-grid" onsubmit="event.preventDefault();saveReportFormOption('symptom')">
+          <div class="field"><label for="newSymptomOption">New Symptom</label><input id="newSymptomOption" maxlength="140" placeholder="Enter symptom option" required></div>
+          <div class="field" style="align-self:end"><button type="submit" class="btn primary">＋ Add Symptom</button></div>
+        </form>
+        <div id="symptomOptionManagerList" class="report-option-manager-list" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card report-main-card">
+      <div class="report-option-manager">
+        <h3>Action Taken Checklist Settings</h3>
+        <p class="report-option-hint">Add, edit, or delete the action choices shown in the BHW Action Taken dropdown.</p>
+        <form class="form-grid" onsubmit="event.preventDefault();saveReportFormOption('action')">
+          <div class="field"><label for="newActionOption">New Action Taken</label><input id="newActionOption" maxlength="140" placeholder="Enter action taken option" required></div>
+          <div class="field" style="align-self:end"><button type="submit" class="btn primary">＋ Add Action</button></div>
+        </form>
+        <div id="actionOptionManagerList" class="report-option-manager-list" style="margin-top:12px"></div>
+      </div>
+    </div>`;
+  renderReportFormOptionManagers();
+}
+
+function renderReportFormOptionManagers(){
+  if(currentUser?.role!=="ADMIN") return;
+  const draw=(kind,items,targetId)=>{const el=$(targetId);if(!el)return;el.innerHTML=items.map(x=>`<div class="report-option-manager-row"><span>${esc(x)}</span><div class="actions"><button type="button" class="btn" data-option="${esc(x)}" onclick="editReportFormOption('${kind}',this.dataset.option)">Edit</button><button type="button" class="btn danger" data-option="${esc(x)}" onclick="deleteReportFormOption('${kind}',this.dataset.option)">Remove</button></div></div>`).join('')||'<div class="notice">No active options.</div>';};
+  draw(SYMPTOM_CHECK_OPTIONS,'symptom','symptomOptionManagerList');
+  draw(ACTION_CHECK_OPTIONS,'action','actionOptionManagerList');
+}
+async function saveReportFormOption(kind,oldName){
+  if(currentUser?.role!=="ADMIN")return;
+  const id=kind==='symptom'?'newSymptomOption':'newActionOption';
+  const input=$(id);const name=String(oldName!==undefined?oldName:input?.value||'').trim();
+  if(!name){alert('Please enter an option.');input?.focus();return;}
+  const buttons=Array.from(document.querySelectorAll('.report-option-manager button'));buttons.forEach(b=>b.disabled=true);
+  try{
+    const result=await apiPost('adminSaveReportFormOption',{kind,oldName:oldName||'',name},true);
+    if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];
+    if(input && oldName===undefined)input.value='';
+    renderReportFormChecklists();
+    alert(oldName?'Option updated successfully.':'Option added successfully.');
+  }catch(err){alert('Unable to save option: '+(err.message||err));}
+  finally{document.querySelectorAll('.report-option-manager button').forEach(b=>b.disabled=false);}
+}
+async function editReportFormOption(kind,name){const next=prompt('Edit option:',name);if(next===null)return;const value=next.trim();if(!value||value===name)return;try{const result=await apiPost('adminSaveReportFormOption',{kind,oldName:name,name:value},true);if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];renderReportFormChecklists();alert('Option updated successfully.');}catch(err){alert('Unable to update option: '+(err.message||err));}}
+async function deleteReportFormOption(kind,name){
+  if(!confirm(`Remove this option from future report checklists?\n\n${name}\n\nExisting saved reports will remain unchanged.`))return;
+  try{const result=await apiPost('adminDeleteReportFormOption',{kind,name},true);if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];renderReportFormChecklists();alert('Option removed. Existing reports were preserved.');}
+  catch(err){alert('Unable to remove option: '+(err.message||err));}
 }
 
 function switchAdminAnalyticsTab(tab){
@@ -5145,7 +5302,7 @@ async function checkIkonekUpdates(showLoading=true){
     const cmp=compare(latest,IKONEK_INSTALLED_VERSION);
     const navButton=document.querySelector('#privateNav [data-page="checkUpdates"]');
     if(cmp>0){
-      if(resultEl){resultEl.className="update-result warn";resultEl.innerHTML='<b>🟡 Update available!</b><br>Installed: v'+esc(IKONEK_INSTALLED_VERSION)+' · Latest: v'+esc(latest)+'<br><span style="font-size:10px">'+esc(manifest.notes||"A newer version has been published.")+'</span>'+(manifest.url?'<br><a href="'+esc(manifest.url)+'" target="_blank" rel="noopener">View update package</a>':'');}
+      if(resultEl){resultEl.className="update-result warn";resultEl.innerHTML='<b>🟡 New Android app version available!</b><br>Installed: v'+esc(IKONEK_INSTALLED_VERSION)+' · Latest: v'+esc(latest)+'<br><span style="font-size:10px">'+esc(manifest.notes||"A newer version has been published.")+'</span><br><span style="font-size:10px">This is an information notice only. No download or installation will start here.</span>';}
       if(navButton){navButton.classList.add("update-available");navButton.classList.remove("update-error");}
     }else if(cmp===0){
       if(resultEl){resultEl.className="update-result success";resultEl.innerHTML='<b>✅ You are up to date.</b><br>Installed and latest version are both v'+esc(latest)+'.';}
@@ -5154,7 +5311,7 @@ async function checkIkonekUpdates(showLoading=true){
       if(resultEl){resultEl.className="update-result";resultEl.innerHTML='Installed version is newer than the public latest.json (v'+esc(latest)+'). Verify the release manifest.';}
       if(navButton){navButton.classList.remove("update-available","update-error");}
     }
-    return {installed:IKONEK_INSTALLED_VERSION,latest,notes:manifest.notes||"",url:manifest.url||"",status:cmp>0?"update-available":cmp===0?"up-to-date":"installed-newer"};
+    return {installed:IKONEK_INSTALLED_VERSION,latest,notes:manifest.notes||"",status:cmp>0?"update-available":cmp===0?"up-to-date":"installed-newer"};
   }catch(error){
     if(latestEl) latestEl.textContent="Unavailable";
     if(resultEl){resultEl.className="update-result error";resultEl.textContent="Unable to check updates. Please check your internet connection and try again. Details: "+(error.message||error);}
