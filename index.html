@@ -1269,8 +1269,8 @@ function updateReportOptionDropdownSummary(kind){
   if(summary) summary.textContent=selected?`${selected} selected`:(kind==='symptom'?'Select symptoms':'Select actions taken');
 }
 function renderReportFormChecklists(){
-  const data=currentUser?.role==='ADMIN'?adminData:currentUnitData;
-  applyReportFormOptionsFromData(data||{});
+  // Do not reload options from cached dashboard data here: that would overwrite
+  // freshly added/edited/deleted options returned by the checklist API.
   const symptom=$('symptomChecklist'), action=$('actionTakenChecklist');
   if(symptom) symptom.innerHTML=SYMPTOM_CHECK_OPTIONS.map((x,i)=>`<label><input type="checkbox" value="${esc(x)}" onchange="syncChecklistTextarea(this,'reportDetails')"><span>${esc(x)}</span></label>`).join('')||'<div class="notice">No symptom options configured. Admin can add options in Checklist Settings.</div>';
   if(action) action.innerHTML=ACTION_CHECK_OPTIONS.map((x,i)=>`<label><input type="checkbox" value="${esc(x)}" onchange="syncChecklistTextarea(this,'reportAction')"><span>${esc(x)}</span></label>`).join('')||'<div class="notice">No action options configured. Admin can add options in Checklist Settings.</div>';
@@ -3273,6 +3273,9 @@ function renderReportPage(){
     ${locked?"":`<section id="reportChecklistPanel" class="report-tab-panel" hidden></section>`}`}`;
   bindReportForm();
   syncReportTypeSelect();
+  // Load the latest server-provided checklist options once when the report
+  // page is built. Subsequent CRUD updates remain authoritative in memory.
+  applyReportFormOptionsFromData(currentUser.role==='ADMIN'?adminData:currentUnitData);
   renderReportFormChecklists();
   if(!locked && unit) savedAdminUnit=unit;
 }
@@ -4127,9 +4130,16 @@ function renderChecklistSettingsPage(){
 
 function renderReportFormOptionManagers(){
   if(currentUser?.role!=="ADMIN") return;
-  const draw=(kind,items,targetId)=>{const el=$(targetId);if(!el)return;el.innerHTML=items.map(x=>`<div class="report-option-manager-row"><span>${esc(x)}</span><div class="actions"><button type="button" class="btn" data-option="${esc(x)}" onclick="editReportFormOption('${kind}',this.dataset.option)">Edit</button><button type="button" class="btn danger" data-option="${esc(x)}" onclick="deleteReportFormOption('${kind}',this.dataset.option)">Remove</button></div></div>`).join('')||'<div class="notice">No active options.</div>';};
-  draw(SYMPTOM_CHECK_OPTIONS,'symptom','symptomOptionManagerList');
-  draw(ACTION_CHECK_OPTIONS,'action','actionOptionManagerList');
+  // Keep the configured options visible in the Settings tab. The previous
+  // argument order passed the category string as the options array, preventing
+  // the Add/Edit/Delete lists from rendering.
+  const draw=(kind,items,targetId)=>{
+    const el=$(targetId); if(!el) return;
+    const safeItems=Array.isArray(items)?items:[];
+    el.innerHTML=safeItems.map(x=>`<div class="report-option-manager-row"><span>${esc(x)}</span><div class="actions"><button type="button" class="btn" data-option="${esc(x)}" onclick="editReportFormOption('${kind}',this.dataset.option)">Edit</button><button type="button" class="btn danger" data-option="${esc(x)}" onclick="deleteReportFormOption('${kind}',this.dataset.option)">Delete</button></div></div>`).join('')||'<div class="notice">No active options. Add an option above to make it available in the report dropdown.</div>';
+  };
+  draw('symptom',SYMPTOM_CHECK_OPTIONS,'symptomOptionManagerList');
+  draw('action',ACTION_CHECK_OPTIONS,'actionOptionManagerList');
 }
 async function saveReportFormOption(kind,oldName){
   if(currentUser?.role!=="ADMIN")return;
@@ -4142,14 +4152,15 @@ async function saveReportFormOption(kind,oldName){
     if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];
     if(input && oldName===undefined)input.value='';
     renderReportFormChecklists();
+    renderReportFormOptionManagers();
     alert(oldName?'Option updated successfully.':'Option added successfully.');
   }catch(err){alert('Unable to save option: '+(err.message||err));}
   finally{document.querySelectorAll('.report-option-manager button').forEach(b=>b.disabled=false);}
 }
-async function editReportFormOption(kind,name){const next=prompt('Edit option:',name);if(next===null)return;const value=next.trim();if(!value||value===name)return;try{const result=await apiPost('adminSaveReportFormOption',{kind,oldName:name,name:value},true);if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];renderReportFormChecklists();alert('Option updated successfully.');}catch(err){alert('Unable to update option: '+(err.message||err));}}
+async function editReportFormOption(kind,name){const next=prompt('Edit option:',name);if(next===null)return;const value=next.trim();if(!value||value===name)return;try{const result=await apiPost('adminSaveReportFormOption',{kind,oldName:name,name:value},true);if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];renderReportFormChecklists();renderReportFormOptionManagers();alert('Option updated successfully.');}catch(err){alert('Unable to update option: '+(err.message||err));}}
 async function deleteReportFormOption(kind,name){
   if(!confirm(`Remove this option from future report checklists?\n\n${name}\n\nExisting saved reports will remain unchanged.`))return;
-  try{const result=await apiPost('adminDeleteReportFormOption',{kind,name},true);if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];renderReportFormChecklists();alert('Option removed. Existing reports were preserved.');}
+  try{const result=await apiPost('adminDeleteReportFormOption',{kind,name},true);if(kind==='symptom')SYMPTOM_CHECK_OPTIONS=result.options||[];else ACTION_CHECK_OPTIONS=result.options||[];renderReportFormChecklists();renderReportFormOptionManagers();alert('Option removed. Existing reports were preserved.');}
   catch(err){alert('Unable to remove option: '+(err.message||err));}
 }
 
