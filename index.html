@@ -1291,29 +1291,12 @@ function applyReportTypesFromData(data){
 function syncReportTypeSelect(){
   const select=$("reportType");
   if(!select) return;
-  const selected=Array.from(select.selectedOptions||[]).map(o=>o.value);
-  select.innerHTML=REPORT_TYPE_OPTIONS.map(type=>`<option value="${esc(type)}">${esc(type)}</option>`).join("");
-  selected.filter(x=>REPORT_TYPE_OPTIONS.includes(x)).forEach(x=>{const o=Array.from(select.options).find(y=>y.value===x);if(o)o.selected=true;});
-  renderReportTypeMultiOptions();
+  const selected=String(select.value||"");
+  select.innerHTML='<option value="">Select report type</option>'+REPORT_TYPE_OPTIONS.map(type=>`<option value="${esc(type)}">${esc(type)}</option>`).join("");
+  if(selected && REPORT_TYPE_OPTIONS.includes(selected)) select.value=selected;
 }
-function selectedReportTypes(){const s=$("reportType");return s?Array.from(s.selectedOptions||[]).map(o=>o.value):[];}
-function updateReportTypeMultiSummary(){const el=$("reportTypeMultiSummary");if(!el)return;const v=selectedReportTypes();el.textContent=v.length?v.join(", "):"Select report type(s)";el.title=el.textContent;}
-function renderReportTypeMultiOptions(){
-  const menu=$("reportTypeMultiMenu");if(!menu)return;
-  const selected=new Set(selectedReportTypes());
-  menu.innerHTML=REPORT_TYPE_OPTIONS.map(type=>`<label class="report-type-multi-option"><input type="checkbox" value="${esc(type)}" ${selected.has(type)?"checked":""} onchange="changeReportTypeSelection(this)"><span>${esc(type)}</span></label>`).join("")||'<div class="report-type-multi-empty">No report types available.</div>';
-  updateReportTypeMultiSummary();
-}
-function changeReportTypeSelection(input){
-  const s=$("reportType");if(!s)return;
-  const o=Array.from(s.options).find(x=>x.value===input.value);if(o)o.selected=!!input.checked;
-  s.setCustomValidity(selectedReportTypes().length?"":"Select at least one report type.");updateReportTypeMultiSummary();
-}
-function toggleReportTypeMenu(force){
-  const menu=$("reportTypeMultiMenu"),trigger=$("reportTypeMultiTrigger");if(!menu||!trigger)return;
-  const open=typeof force==="boolean"?force:menu.hidden;menu.hidden=!open;trigger.setAttribute("aria-expanded",String(open));
-}
-document.addEventListener("click",event=>{const wrap=$("reportTypeMulti");if(wrap&&!wrap.contains(event.target))toggleReportTypeMenu(false);});
+function selectedReportType(){return String($("reportType")?.value||"").trim();}
+function selectedReportTypes(){const value=selectedReportType();return value?[value]:[];}
 
 const LOGO = "assets/icon-512.png";
 const LOCAL_UNITS = [{"group": 1, "name": "Himlayang Katoliko / Sta Elena Memorial Park / Antipolo Public Cemetery 1", "covered": ["Himlayang Katoliko", "Sta Elena Memorial Park", "Antipolo Public Cemetery 1 (Besides Sta. Elena Memorial Park)"]}, {"group": 2, "name": "Our Lady of Peace Crematorium and Columbarium 1 / Antipolo Public Cemetery 2 / Antipolo Public Cemetery 3", "covered": ["Our Lady of Peace Crematorium and Columbarium 1", "Antipolo Public Cemetery 2", "Antipolo Public Cemetery 3 (Infront of Antipolo Public Cemetery 2)"]}, {"group": 3, "name": "Our Lady of Peace Memorial Park 2 / Our Lady of Peace Memorial Park 3", "covered": ["Our Lady of Peace Memorial Park 2", "Our Lady of Peace Memorial Park 3 (Infront of OLPMP 2)"]}, {"group": 4, "name": "Transfiguration of Christ Parish Church", "covered": ["Transfiguration of Christ Parish Church"]}, {"group": 5, "name": "Pantay Public Cemetery", "covered": ["Pantay Public Cemetery"]}, {"group": 6, "name": "Boso-Boso Public Cemetery", "covered": ["Boso-Boso Public Cemetery"]}, {"group": 7, "name": "Heaven’s Gate 2 Memorial Park", "covered": ["Heaven’s Gate 2 Memorial Park"]}, {"group": 8, "name": "Loyola Gardens of Antipolo", "covered": ["Loyola Gardens of Antipolo"]}, {"group": 9, "name": "Providence Memorial Park", "covered": ["Providence Memorial Park"]}, {"group": 10, "name": "Sto. Rosario Memorial Park", "covered": ["Sto. Rosario Memorial Park"]}, {"group": 11, "name": "Heaven’s Gate 1 Memorial Park", "covered": ["Heaven’s Gate 1 Memorial Park"]}, {"group": 12, "name": "Gethsemane Memorial Park", "covered": ["Gethsemane Memorial Park"]}, {"group": 13, "name": "Haven of Angels Memorial and Crematorium", "covered": ["Haven of Angels Memorial and Crematorium"]}, {"group": 14, "name": "Valley of Sympathy Memorial Park", "covered": ["Valley of Sympathy Memorial Park"]}];
@@ -3243,7 +3226,7 @@ function renderReportPage(){
         <div class="card report-main-card"><form id="reportForm" class="report-form">
           <div class="form-title">1. BARANGAY DETAILS</div>
           <div class="form-grid two"><div class="field"><label>Barangay <span>*</span></label>${unitsHtml}</div><div class="field"><label>Submitted By</label><input value="${esc(reporter)}" readonly></div></div>
-          <div class="form-grid two"><div class="field"><label>Report Type <span>*</span></label><div class="report-type-multi" id="reportTypeMulti"><button type="button" class="report-type-multi-trigger" id="reportTypeMultiTrigger" aria-expanded="false" onclick="toggleReportTypeMenu()"><span id="reportTypeMultiSummary">Select report type(s)</span><span aria-hidden="true">⌄</span></button><div class="report-type-multi-menu" id="reportTypeMultiMenu" hidden></div></div><select id="reportType" multiple hidden aria-hidden="true" tabindex="-1"></select></div><div class="field"><label>Status <span>*</span></label><select id="reportStatus" required><option value="Manageable">Manageable</option><option value="Consultation / Medical Evaluation">Consultation / Medical Evaluation</option><option value="Immediate Transfer / Referral">Immediate Transfer / Referral</option></select></div></div>
+          <div class="form-grid two"><div class="field"><label for="reportType">Report Type <span>*</span></label><select id="reportType" required><option value="">Select report type</option></select><small class="field-hint">Select one report type per report.</small></div><div class="field"><label>Status <span>*</span></label><select id="reportStatus" required><option value="Manageable">Manageable</option><option value="Consultation / Medical Evaluation">Consultation / Medical Evaluation</option><option value="Immediate Transfer / Referral">Immediate Transfer / Referral</option></select></div></div>
           <div class="form-title">2. PATIENT INFORMATION</div>
           <div class="form-grid three"><div class="field"><label>Patient Name</label><input id="patientName" placeholder="Full name"></div><div class="field"><label>Age</label><input id="patientAge" type="number" min="0" max="120" step="0.01" placeholder="Age in years (e.g. 0.05 for under 1 month)"></div><div class="field"><label>Gender</label><select id="patientGender"><option value="">Select</option><option>Male</option><option>Female</option></select></div></div>
           <div class="form-grid two"><div class="field"><label>Address</label><input id="patientAddress" placeholder="Address"></div><div class="field"><label>Contact Number</label><input id="patientContact" type="tel" inputmode="tel" placeholder="09XXXXXXXXX"></div></div>
@@ -3319,7 +3302,7 @@ function bindReportForm(){
       const leader=currentUser.fullName||currentUser.username||"Admin";
       const payload={
         cemetery:site,teamLeader:leader,reporter:leader,
-        type:selectedReportTypes().join(" | "),count:1,status:$("reportStatus").value,
+        type:selectedReportType(),count:1,status:$("reportStatus").value,
         details:$("reportDetails").value.trim(),actionTaken:$("reportAction").value.trim(),
         localReportId:generateLocalReportId(),
         patientId:"",patient:{fullName:patientName,age:patientAge,gender:$("patientGender").value,address:$("patientAddress").value.trim(),contactNumber:$("patientContact").value.trim(),medicalHistory:$("patientMedicalHistory").value.trim(),medicinesTaken:$("patientMedicines").value.trim(),knownAllergies:$("patientAllergies").value.trim()}
@@ -3885,8 +3868,8 @@ function renderPatientReportType(patient){
   const report=getPatientLinkedReport(patient);
   const raw=String(report?.type||patient?.reportType||"").trim();
   if(!raw) return '<span class="patient-report-type-empty">No linked report type</span>';
-  const types=[...new Set(raw.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean))];
-  const chips=types.map(type=>`<span class="patient-report-type-chip">${esc(type)}</span>`).join("");
+  const type=raw.split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean)[0]||raw;
+  const chips=`<span class="patient-report-type-chip">${esc(type)}</span>`;
   const status=String(report?.status||"").trim();
   return `<div class="patient-report-type-list">${chips}${status?`<small class="patient-report-status">Status: ${esc(status)}</small>`:""}</div>`;
 }
@@ -3939,7 +3922,7 @@ function editPatientRecord(patientId){
   tr.innerHTML=`<td>${esc(row.patientId||"")}</td>
     <td>${esc(formatPatientDateTime(row.createdAt))}</td>
     <td><input id="editPatientName" value="${esc(row.fullName||"")}" maxlength="160"></td>
-    <td>${(()=>{const linked=getPatientLinkedReport(row);const selected=String(linked?.type||row.reportType||"").split(/\s*\|\s*/).filter(Boolean);const options=[...new Set([...(REPORT_TYPE_OPTIONS||[]),...selected])];return linked?`<div id="editPatientReportTypes" style="display:grid;gap:7px;min-width:180px;max-width:260px;max-height:210px;overflow:auto;padding:8px;border:1px solid var(--border);border-radius:9px;background:var(--surface,white)">${options.map((t,i)=>`<label style="display:flex;align-items:flex-start;gap:8px;padding:5px 4px;font-size:11px;line-height:1.35;cursor:pointer"><input type="checkbox" class="edit-patient-report-type-check" value="${esc(t)}" ${selected.some(x=>x.toLowerCase()===t.toLowerCase())?'checked':''} style="width:18px;height:18px;min-width:18px;margin:0;accent-color:var(--primary);cursor:pointer"><span>${esc(t)}</span></label>`).join("")}</div><small style="display:block;color:var(--muted);margin-top:5px">Check / uncheck report types</small>`:`<span class="patient-report-type-empty">No linked report to edit</span>`})()}</td>
+    <td>${(()=>{const linked=getPatientLinkedReport(row);const selected=String(linked?.type||row.reportType||"").split(/\s*\|\s*/).filter(Boolean)[0]||"";const options=[...new Set([...(REPORT_TYPE_OPTIONS||[]),...(selected?[selected]:[])])];return linked?`<select id="editPatientReportType" style="min-width:180px"><option value="">Select report type</option>${options.map(t=>`<option value="${esc(t)}" ${selected.toLowerCase()===t.toLowerCase()?"selected":""}>${esc(t)}</option>`).join("")}</select>`:`<span class="patient-report-type-empty">No linked report to edit</span>`})()}</td>
     <td><div style="display:grid;gap:4px"><input id="editPatientAge" type="number" min="0" max="120" value="${esc(row.age??"")}" placeholder="Age"><select id="editPatientGender"><option value="">Select</option>${['Male','Female'].map(v=>`<option ${String(row.gender||'')===v?'selected':''}>${v}</option>`).join('')}</select></div></td>
     <td><input id="editPatientAddress" value="${esc(row.address||"")}" maxlength="500"></td>
     <td><input id="editPatientContact" value="${esc(row.contactNumber||"")}" maxlength="40"></td>
@@ -3956,14 +3939,14 @@ async function savePatientRecord(patientId){
   const patientSource=currentUser.role==="ADMIN"?(adminData?.patients||[]):(currentUnitData?.patients||[]);
   const patientRow=patientSource.find(r=>String(r.patientId||"").trim()===String(patientId||"").trim());
   const linkedReport=patientRow?getPatientLinkedReport(patientRow):null;
-  const selectedTypes=Array.from(document.querySelectorAll('#editPatientReportTypes .edit-patient-report-type-check:checked')).map(o=>o.value);
-  if(linkedReport && $("editPatientReportTypes") && !selectedTypes.length){if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=originalSaveHtml;}alert("Select at least one Report Type.");return;}
+  const selectedType=String($("editPatientReportType")?.value||"").trim();
+  if(linkedReport && $("editPatientReportType") && !selectedType){if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=originalSaveHtml;}alert("Select at least one Report Type.");return;}
   const data={patientId,fullName:$('editPatientName')?.value.trim(),age:$('editPatientAge')?.value,gender:$('editPatientGender')?.value,address:$('editPatientAddress')?.value.trim(),contactNumber:$('editPatientContact')?.value.trim()};
   if(!data.fullName){if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=originalSaveHtml;}alert("Patient name is required.");return;}
   try{
     await apiPost(currentUser.role==="ADMIN"?"adminupdatepatient":"updatepatient",data);
-    if(linkedReport && selectedTypes.length){
-      await apiPost(currentUser.role==="ADMIN"?"adminupdatereporttypes":"bhwupdatereporttypes",{reportId:linkedReport.reportId,reportTypes:selectedTypes});
+    if(linkedReport && selectedType){
+      await apiPost(currentUser.role==="ADMIN"?"adminupdatereporttypes":"bhwupdatereporttypes",{reportId:linkedReport.reportId,reportTypes:[selectedType]});
     }
     await loadRoleData(true);
     renderPatientRecordsPage();
